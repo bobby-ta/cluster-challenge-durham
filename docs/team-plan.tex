@@ -1,0 +1,231 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1.7cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{booktabs,tabularx,array,enumitem,xcolor,titlesec,fancyhdr,hyperref}
+\usepackage[table]{xcolor}
+
+\definecolor{accent}{HTML}{2a78d6}
+\definecolor{ink2}{HTML}{52514e}
+\definecolor{rowtint}{HTML}{f2f6fc}
+\hypersetup{colorlinks,linkcolor=accent,urlcolor=accent}
+\titleformat{\section}{\large\bfseries\color{accent}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+\setlist{nosep,leftmargin=1.2em}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\pagestyle{fancy}\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\small\color{ink2}CIUK 2026 Durham subchallenge: team plan}
+\fancyfoot[R]{\small\color{ink2}\thepage}
+\newcommand{\who}[1]{\textbf{\color{accent}#1}}
+\newcommand{\deadline}[1]{\textbf{\color{red!70!black}#1}}
+
+\begin{document}
+
+{\LARGE\bfseries CIUK Cluster Challenge 2026: Durham subchallenge}\\[2pt]
+{\large Team plan, Tue 20 to Sun 25 October}\\[2pt]
+{\small\color{ink2}Team: TODO-team-name \quad Users: TODO $\times 4$ \quad Repo: TODO-link}
+
+\section*{At a glance}
+\begin{itemize}
+  \item \textbf{Job days:} Tue 20, Wed 21, Thu 22, and Fri 23 until the queues close at \deadline{16:00}. Submit final reruns by \deadline{Fri 12:00}.
+  \item \textbf{Write-up:} Fri afternoon, Sat 24 and Sun 25. The report is \deadline{2 pages A4 maximum} and goes with a presentation.
+  \item \textbf{Access:} \texttt{login8.cosma.dur.ac.uk}, account \texttt{do022}, queues \texttt{ciuk-dine} and \texttt{ciuk-dine2}. Jobs run for at most \textbf{1 hour} and must use exclusive nodes.
+  \item \textbf{Nodes:} DINE is \textbf{2$\times$ AMD EPYC 7302} (Zen~2, 16 cores each, 512\,GB), per the COSMA docs. DINE2's CPU is \textbf{not documented}, so the recon job on Tuesday morning finds it out.
+  \item \textbf{Code changes are out of scope.} Compiler and runtime settings are allowed, but document every flag.
+  \item \textbf{Every submitted item} must list the team name and all four usernames.
+\end{itemize}
+
+\section{Where the marks are, and what that means for us}
+\begin{tabularx}{\linewidth}{@{}l r L@{}}
+\toprule
+\textbf{Marked item} & \textbf{Pts} & \textbf{What we do about it}\\
+\midrule
+likwid-bench findings, node 1 / node 2 & 20 + 20 & Owners: \who{B} (DINE) and \who{C} (DINE2). Same script on both nodes. Sweep thread count, placement and working-set size, and compare against theoretical peaks.\\
+\rowcolor{rowtint} Node 1 vs node 2 evaluation & 10 & Owner: \who{C}. One table with both nodes' peaks, measured values, efficiency and ridge point.\\
+Grid behaviour, node 1 / node 2 & 10 + 10 & Owner: \who{D}. Strong scaling for each L on each node. Explain where it flattens using the likwid data.\\
+\rowcolor{rowtint} Grid vs LIKWID & 10 & Owner: \who{D}. Roofline with measured roofs, plus Grid's point from likwid-perfctr.\\
+Best-case Grid throughput & 10 & Owner: \who{A}. Separate tuning runs over compiler, binding, NUMA and L. Report the best number and its exact config.\\
+\rowcolor{rowtint} Time efficiency of testbed use & 10 & Everyone. Job arrays, an overnight queue that is always full, \texttt{runlog.csv}, and the job count in the report.\\
+\bottomrule
+\end{tabularx}
+
+\textbf{Half the marks come from likwid-bench (50 of 100).} B and C own that work full time, and D and A shouldn't take queue slots from it on Tuesday.
+
+\section{Who does what}
+\begin{tabularx}{\linewidth}{@{}l L L@{}}
+\toprule
+\textbf{Person} & \textbf{Job days (Tue to Fri)} & \textbf{Write-up (Fri to Sun)}\\
+\midrule
+\who{A}: build and tuning lead, editor &
+Builds Grid for both node types and a second compiler. Owns \texttt{config/}, \texttt{build/} and the repo rules. After the builds, runs the best-case throughput tuning. &
+Setup section (hardware table, software stack, all flags, experiment count), conclusions, page budget, final edit, slide deck.\\
+\rowcolor{rowtint}\who{B}: DINE likwid owner &
+DINE recon, module fixes, theoretical peaks, all likwid-bench runs on DINE. Reviews D's Grid data on DINE for consistency. &
+\S2.1 DINE capability: bandwidth and FLOP/s figures, about 0.35 pages.\\
+\who{C}: DINE2 likwid owner &
+Same as B for DINE2. Finds out DINE2's CPU \textbf{by Tue 11:00} and tells A which SIMD build to make. &
+\S2.2 DINE2 and \S2.3 node comparison table, about 0.45 pages.\\
+\rowcolor{rowtint}\who{D}: Grid and analysis lead &
+\texttt{analysis/} pipeline, Grid strong scaling on both nodes, likwid-perfctr on Grid, roofline. Checks that perfctr works on day 1. &
+\S3 Grid and \S4 Grid vs LIKWID and roofline, about 0.9 pages, plus every figure.\\
+\bottomrule
+\end{tabularx}
+
+\textbf{Pairing for cover:} A$\leftrightarrow$D (Grid) and B$\leftrightarrow$C (likwid). If someone's account isn't active, their pair partner submits their jobs while they do analysis and reading.\\
+\textbf{Syncs:} 15 minutes at \textbf{09:30} (what's in the queue, what failed) and \textbf{18:00} (look at plots, agree the overnight queue). Someone checks the queue last thing at night.
+
+\section{Day-by-day schedule}
+
+\subsection*{Tue 20: recon, builds, smoke tests, first overnight queue}
+\begin{tabularx}{\linewidth}{@{}l L@{}}
+\toprule
+\who{All} & 09:00: clone the repo on COSMA, fill in \texttt{config/team.env}, and check everyone can submit.\\
+\who{B} & 09:15 \texttt{scripts/submit.sh dine recon}. Fix modules in \texttt{config/dine.env}. Fill in \texttt{analysis/peaks.py} from the spec sheet, noting the DIMM speed and NUMA (NPS) mode from \texttt{likwid-topology}. Smoke test \texttt{likwid\_bench -{}- threads}, check the CSV, then queue repeats.\\
+\who{C} & 09:15 \texttt{scripts/submit.sh dine2 recon}. Identify the CPU, SIMD level (AVX-512?), sockets, NUMA, memory and SMT. \deadline{Tell A the SIMD build by 11:00}. Then do the same as B for DINE2.\\
+\who{A} & Build \texttt{cpu-avx2} for DINE on the login node (\texttt{build/build\_grid.sh dine cpu-avx2 8}), then the DINE2 build. Submit one \texttt{grid -{}-array=32} smoke run on each node and \textbf{time it}. The time sets the size of the Grid campaign.\\
+\who{D} & Check \texttt{perfctr-smoke.txt} from recon. \textbf{If counters can't be read, ask on the official CIUK channel straight away.} Run \texttt{collect.py} and \texttt{plots.py} on the first likwid output. Work out Grid's working set for each L vs cache sizes (see \S6) so we have predictions before the data arrives.\\
+\rowcolor{rowtint}\textbf{18:00} & Queue overnight: likwid \texttt{threads} $\times$3 and \texttt{sizes} on both nodes, plus Grid strong scaling on DINE if the build is ready (\texttt{scripts/campaign.sh dine 3}).\\
+\bottomrule
+\end{tabularx}
+
+\subsection*{Wed 21: main campaign}
+\begin{tabularx}{\linewidth}{@{}l L@{}}
+\toprule
+\who{A} & Finish any build still pending. Build the second compiler (\texttt{cpu-avx2-clang}, or AOCC if COSMA has it). First tuning runs: \texttt{OMP\_PROC\_BIND=spread} vs \texttt{close}, \texttt{NUMACTL=-{}-interleave=all}.\\
+\who{B} & Analyse the DINE runs: where bandwidth saturates (cores per NUMA domain and per socket), FLOP/s vs peak, compact vs scatter. Fill gaps (NT-store kernels, a single NUMA domain run). Start bullet notes for \S2.1.\\
+\who{C} & The same for DINE2. Start the comparison table.\\
+\who{D} & Grid strong scaling on DINE2. \texttt{MAX\_L=48} at 8, 16 and full threads on both nodes. likwid-perfctr runs (\texttt{PERFCTR="MEM FLOPS\_SP"}) at 1, 8, 16 and full threads, plus one \texttt{TIMELINE=1} run at full threads.\\
+\rowcolor{rowtint}\textbf{18:00} & \textbf{First full set of figures reviewed.} Write the list of gaps and queue them overnight.\\
+\bottomrule
+\end{tabularx}
+
+\subsection*{Thu 22: fill the gaps, best-case throughput, weak scaling}
+\begin{tabularx}{\linewidth}{@{}l L@{}}
+\toprule
+\who{A} & Best-case sweep: compiler $\times$ binding $\times$ NUMA policy $\times$ SMT on/off, at the best L. Report the best \texttt{Gflops\_dwf4} with its full config and $\geq$3 repeats.\\
+\who{B}/\who{C} & Extra runs Wednesday showed are needed (SMT, frequency behaviour, odd outliers). Draft the section text.\\
+\who{D} & Weak scaling: compare runs where $L^4$ per thread stays roughly constant. Grid's axpy vs likwid triad. Draft roofline figures for both nodes.\\
+\rowcolor{rowtint}\textbf{18:00} & \textbf{Freeze.} Agree the final rerun list for Friday morning. Anything not on the list doesn't run.\\
+\bottomrule
+\end{tabularx}
+
+\subsection*{Fri 23: last reruns, then write-up begins}
+\begin{itemize}
+  \item \textbf{Morning:} Submit reruns from the freeze list by \deadline{12:00}. Jobs submitted before 16:00 still run after the queues close. Everyone turns their bullet notes into prose.
+  \item \textbf{Afternoon:} D regenerates all figures from final data by 18:00. A assembles draft v0 in \texttt{report/report.tex} by end of day.
+\end{itemize}
+
+\subsection*{Sat 24: complete draft and slides}
+\begin{itemize}
+  \item \textbf{Morning:} Complete draft v1. It'll be too long, and that's expected.
+  \item \textbf{Afternoon:} A cuts it to 2 pages with the page budget in \S5. Each owner makes 2--3 slides for their section, and A builds the deck.
+\end{itemize}
+
+\subsection*{Sun 25: review and submit}
+\begin{itemize}
+  \item \textbf{Cross-review:} B reviews D's sections, D reviews C's, C reviews A's, and A reviews B's. Each reviewer checks every claim against a figure or number.
+  \item \textbf{Final checks:} team name and usernames on everything, and the 2-page limit.
+  \item \textbf{Rehearse} the presentation, then submit.
+\end{itemize}
+
+\section{Experiment matrix}
+Run priority-1 items first. Only move to the next priority when everything above it is in the queue. The job counts are for both nodes together.
+
+\begin{tabularx}{\linewidth}{@{}c L l r@{}}
+\toprule
+\textbf{Prio} & \textbf{Experiment} & \textbf{Submit with} & \textbf{Jobs}\\
+\midrule
+1 & Recon on each node & \texttt{submit.sh <n> recon} & 2\\
+1 & likwid-bench vs threads, compact + scatter, all flop and bandwidth kernels, 3 repeats inside each job, 3 jobs & \texttt{likwid\_bench -{}- threads} & 6\\
+1 & likwid-bench vs working-set size, 1 thread and all cores & \texttt{likwid\_bench -{}- sizes} & 2\\
+1 & Grid strong scaling, $L\le32$ (covers 24 and 32), threads 1,2,4,6,8,12,16,20,24,28,32, 3 repeats & \texttt{grid -{}-array=...} & 66\\
+1 & likwid-perfctr on Grid (MEM, FLOPS\_SP) at 1, 8, 16 and all threads & \texttt{PERFCTR=... TAG=perfctr} & 8\\
+\rowcolor{rowtint} 2 & $L=48$ at 8, 16 and all threads & \texttt{MAX\_L=48 TAG=L48} & 6\\
+\rowcolor{rowtint} 2 & Best-case tuning: compiler, binding, \texttt{numactl}, SMT & \texttt{TAG=tune-...} & 12--20\\
+\rowcolor{rowtint} 2 & perfctr timeline (separate setup from the Dirac phases) & \texttt{TIMELINE=1} & 2\\
+3 & likwid extras: single NUMA domain, SMT, non-temporal stores, repeats at different times of day & \texttt{KERNELS=...} & 4--8\\
+\bottomrule
+\end{tabularx}
+
+\textbf{Around 110 jobs in total.} If Tuesday's timing run shows that 1-thread Grid at $L\le32$ won't finish in 55 minutes, use \texttt{MAX\_L=24} for $T\le2$. In that case, normalise efficiency to the smallest thread count that finished, and say so in the report.
+
+\section{Report plan (2 pages A4, two columns)}
+\begin{tabularx}{\linewidth}{@{}l l L r@{}}
+\toprule
+\textbf{Section} & \textbf{Owner} & \textbf{Content and figures} & \textbf{Space}\\
+\midrule
+1 Setup & A & Hardware table (theoretical peaks with sources), compilers and flags, pinning policy, number of experiments & 0.15p\\
+2.1 DINE & B & \texttt{likwid\_bw\_threads}, \texttt{likwid\_flops\_threads}, \texttt{likwid\_bw\_sizes}: \% of peak, saturation point, why & 0.35p\\
+2.2/2.3 DINE2, comparison & C & Same figures and a combined table with ridge points & 0.45p\\
+3 Grid & D & \texttt{grid\_scaling\_<node>}, \texttt{grid\_vs\_L}, best-case number & 0.5p\\
+4 Grid vs LIKWID & D & \texttt{roofline\_<node>}: Grid-reported vs counter-measured FLOP/s, axpy vs triad & 0.4p\\
+5 Conclusions & A & Answer the four questions in the brief in one line each & 0.15p\\
+\bottomrule
+\end{tabularx}
+
+The brief asks four questions, and the report must answer each one explicitly:
+\begin{enumerate}
+  \item How does Grid compare to LIKWID, where do they differ, and why?
+  \item Where does Grid sit on the roofline?
+  \item How well does Grid strong scale, and can the likwid data explain it?
+  \item What can we say about weak scaling?
+\end{enumerate}
+
+\section{Technical notes: hypotheses to confirm or overturn}
+\subsection*{Theoretical peaks (DINE; fill in DINE2 after recon)}
+\begin{itemize}
+  \item \textbf{Compute:} $2\times16$ cores $\times$ 3.0\,GHz base $\times$ 16 DP FLOP/cycle gives 1.54\,TFLOP/s DP and 3.07\,TFLOP/s SP. The count of 16 comes from 2 FMA pipes $\times$ 4 doubles $\times$ 2. At 3.3\,GHz boost the figures are about 10\% higher. Report both, because all-core AVX clocks sit somewhere in between.
+  \item \textbf{Memory:} 2 sockets $\times$ 8 channels $\times$ DDR4-3200 $\times$ 8\,B gives 409.6\,GB/s. Check the DIMM speed with recon. Expect triad to reach roughly 60--80\% of this.
+  \item \textbf{Ridge point:} about 3\,TFLOP/s SP divided by about 300\,GB/s measured, giving roughly 10\,FLOP/byte. That's far to the right of where Grid is likely to sit.
+\end{itemize}
+
+\subsection*{likwid-bench pitfalls}
+\begin{itemize}
+  \item Kernels without NT stores (\texttt{copy}, \texttt{triad}) trigger \textbf{write-allocate}, so likwid's MB/s understates the real traffic. Compare them with the \texttt{\_mem} (non-temporal) variants and explain the gap.
+  \item The scalar \texttt{peakflops} kernel can't reach peak. Only the \texttt{\_avx\_fma} kernel (or AVX-512 on DINE2, if present) can. Plot all of them; the ratios are themselves a finding.
+  \item On Zen~2, L3 is 16\,MB per CCX, not shared across the socket. The \texttt{sizes} sweep should show this. NUMA layout depends on the NPS mode: read it from \texttt{likwid-topology}.
+\end{itemize}
+
+\subsection*{Grid}
+\begin{itemize}
+  \item \textbf{One run covers every L up to \texttt{-{}-max-L}.} So $L=24$ and 32 both come from each run. The JSON's \texttt{Gflops\_dwf4} and \texttt{Gflops\_wilson} are in \textbf{single precision} (FP64 is switched off by the required flags), so compare them against the \textbf{SP} roof.
+  \item \textbf{Rough arithmetic intensity, assuming no cache reuse.} The Wilson dslash does about 1320\,FLOP per site and moves about 1440\,B per site in SP (8 neighbour spinors at 96\,B, 8 links at 72\,B, and a 96\,B output). That gives roughly 0.9\,FLOP/B. DWF reuses each link across the fifth dimension, so its AI is higher. \textbf{Prediction: memory-bound}, with strong scaling flattening where likwid triad saturates.
+  \item \textbf{Working set.} $L=24$ is 332k sites: about 32\,MB per SP fermion field and about 96\,MB of gauge field. $L=32$ is 3.2$\times$ larger. Compare these with 2$\times$128\,MB of L3 split into 16\,MB slices. A drop in GFLOP/s from $L=24$ to 32 at full threads would be the cache-fit effect.
+  \item \textbf{Grid vs counters.} Grid reports \emph{nominal} FLOPs from a fixed formula, while perfctr counts \emph{retired} FP operations for the whole process, setup included. The timeline mode helps separate the two.
+  \item Benchmark\_Grid also runs an \textbf{axpy memory benchmark}. That gives a direct, low-cost comparison with likwid \texttt{stream} and \texttt{triad}.
+\end{itemize}
+
+\section{Risks and fallbacks}
+\begin{tabularx}{\linewidth}{@{}L L@{}}
+\toprule
+\textbf{Risk} & \textbf{Fallback}\\
+\midrule
+likwid-perfctr can't read counters (permissions, or AMD data-fabric counters missing) & Ask on the CIUK channel on Tuesday. Meanwhile, build the roofline from the theoretical AI plus Grid's reported FLOP/s and the likwid bandwidth, and say clearly which numbers are estimates.\\
+\rowcolor{rowtint} Grid build fails, or pixi has no internet access & Do a manual \texttt{configure} with COSMA modules, using the same Grid commit (\texttt{e2d607f}). A gives it until Tue 15:00, then asks for help in the team.\\
+Queue contention with other teams & Keep the queue full overnight, use arrays, and run priority 1 first. Never leave nodes idle while we analyse.\\
+\rowcolor{rowtint} 1-thread Grid runs exceed the 1-hour limit & Use a smaller \texttt{MAX\_L} for low thread counts and normalise to the smallest completed thread count.\\
+DINE2 turns out to be a very different node (for example GPU-heavy, with a different CPU) & We use the CPU only. That difference becomes the core of the node-comparison section.\\
+\rowcolor{rowtint} Results become inconsistent between team members & Always submit through \texttt{scripts/submit.sh}. Every run directory has \texttt{meta.txt} with the git hash, modules and environment. Commit after every batch.\\
+\bottomrule
+\end{tabularx}
+
+\section{Repository conventions}
+\begin{itemize}
+  \item \textbf{Repo layout:}
+  \begin{itemize}
+    \item \texttt{slurm/}: job scripts. \texttt{scripts/submit.sh}: the only way to submit.
+    \item \texttt{results/<node>/<experiment>/<jobid>/}: raw output and metadata for each job.
+    \item \texttt{results/runlog.csv}: one line per job.
+    \item \texttt{analysis/}: \texttt{collect.py}, then \texttt{plots.py}, writing to \texttt{report/figs}.
+  \end{itemize}
+  \item \textbf{Tag non-default runs.} Anything that isn't a default run gets a \texttt{TAG}, such as \texttt{TAG=tune-clang-spread}, so it lands in its own experiment directory.
+  \item \textbf{Commit results as soon as jobs finish.} Use a commit message like \texttt{results: dine likwid threads x3}.
+  \item \textbf{Lock any shared COSMA directory} with \texttt{setfacl} so other teams can't read it.
+\end{itemize}
+
+\end{document}
