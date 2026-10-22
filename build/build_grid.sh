@@ -27,8 +27,9 @@ if [[ ! -d $SRC ]]; then
   git clone https://github.com/aportelli/grid-benchmark.git "$SRC"
   git -C "$SRC" checkout "$BENCH_COMMIT"
 fi
-rm -rf "$SRC/systems/cosma"
-cp -r "$REPO/build/systems/cosma" "$SRC/systems/cosma"
+# Several builds may start together (slurm/build.sbatch), so refresh our system files under a lock.
+( flock 9; rm -rf "$SRC/systems/cosma"; cp -r "$REPO/build/systems/cosma" "$SRC/systems/cosma" ) \
+  9>"$GRID_ENV_ROOT/src/.benchmark.lock"
 
 cd "$SRC"
 [[ -d $ENV_DIR ]] || ./bootstrap-env.sh "$ENV_DIR" cosma
