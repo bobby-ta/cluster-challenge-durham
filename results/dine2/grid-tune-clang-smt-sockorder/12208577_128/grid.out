@@ -1,0 +1,1114 @@
+SharedMemoryMpi:  World communicator of size 1
+SharedMemoryMpi:  Node  communicator of size 1
+SharedMemoryMpi: SharedMemoryAllocate 1073741824 MMAP anonymous implementation 
+
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+__|_ |  |  |  |  |  |  |  |  |  |  |  | _|__
+__|_                                    _|__
+__|_   GGGG    RRRR    III    DDDD      _|__
+__|_  G        R   R    I     D   D     _|__
+__|_  G        R   R    I     D    D    _|__
+__|_  G  GG    RRRR     I     D    D    _|__
+__|_  G   G    R  R     I     D   D     _|__
+__|_   GGGG    R   R   III    DDDD      _|__
+__|_                                    _|__
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+  |  |  |  |  |  |  |  |  |  |  |  |  |  |  
+
+
+Copyright (C) 2015 Peter Boyle, Azusa Yamaguchi, Guido Cossu, Antonin Portelli and other authors
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+Current Grid git commit hash=e2d607f6c708362050ec26cbe89fc971a1a879c5: (HEAD) clean
+
+Grid : Message : ================================================ 
+Grid : Message : MPI is initialised and logging filters activated 
+Grid : Message : ================================================ 
+Grid : Message : This rank is running on host gc003.pri.cosma.local at local time 2026-10-22 23:31:42
+Grid : Message : Requested 1073741824 byte stencil comms buffers 
+Grid : Message : MemoryManager::Init() setting up
+Grid : Message : MemoryManager::Init() cache pool for recent host   allocations: SMALL 8 LARGE 2 HUGE 0
+Grid : Message : MemoryManager::Init() cache pool for recent device allocations: SMALL 16 LARGE 8 Huge 0
+Grid : Message : MemoryManager::Init() cache pool for recent shared allocations: SMALL 16 LARGE 8 Huge 0
+Grid : Message : MemoryManager::Init() Unified memory space
+Grid : Message : 0.117250 s : ===============================================================================
+Grid : Message : 0.117400 s : Grid Default Decomposition patterns
+Grid : Message : 0.117410 s : ------------------------------------------
+Grid : Message : 0.117420 s : * OpenMP threads : 128
+Grid : Message : 0.117430 s : * MPI layout     : 1 1 1 1 
+Grid : Message : 0.117540 s : * Shm layout     : 1 1 1 1 
+Grid : Message : 0.117550 s : * vReal          : 512bits ; 1 2 2 2 
+Grid : Message : 0.117570 s : * vRealF         : 512bits ; 2 2 2 2 
+Grid : Message : 0.117580 s : * vRealD         : 512bits ; 1 2 2 2 
+Grid : Message : 0.117590 s : * vComplex       : 512bits ; 1 1 2 2 
+Grid : Message : 0.117610 s : * vComplexF      : 512bits ; 1 2 2 2 
+Grid : Message : 0.117630 s : * vComplexD      : 512bits ; 1 1 2 2 
+Grid : Message : 0.117640 s : * ranks          : 1
+Grid : Message : 0.117650 s : * nodes          : 1
+Grid : Message : 0.117660 s : * ranks/node     : 1
+Grid : Message : 0.117850 s : ===============================================================================
+Grid : Message : 0.117860 s :  Memory benchmark 
+Grid : Message : 0.117870 s : ===============================================================================
+Grid : Message : 0.117880 s : Benchmarking a*x + y bandwidth
+Grid : Message : 0.117890 s : ------------------------------------------
+Grid : Message : 0.117920 s :     L  size (MB/node)     time (usec)       GB/s/node    Gflop/s/node
+Grid : Message : 0.435025 s :     8            0.75            3.97          184.47           16.51
+Grid : Message : 0.527404 s :    16           12.00            6.97         1681.31          150.44
+Grid : Message : 0.592406 s :    24           60.75           16.01         3705.44          331.56
+Grid : Message : 0.945035 s :    32          192.00          211.62          886.04           79.28
+Grid : Message : 1.921716 s :    40          468.75         1115.66          410.31           36.71
+Grid : Message : 3.305719 s :    48          972.00         2624.86          361.63           32.36
+Grid : Message : 5.722220 s :    56         1800.75         5028.07          349.75           31.29
+Grid : Message : 7.282794 s :    64         3072.00         8740.23          343.24           30.71
+Grid : Message : 7.290772 s : ===============================================================================
+Grid : Message : 7.290812 s :  SU(4) benchmark 
+Grid : Message : 7.290815 s : ===============================================================================
+Grid : Message : 7.290821 s : Benchmarking z = y*x SU(4) bandwidth
+Grid : Message : 7.290822 s : ------------------------------------------
+Grid : Message : 7.290827 s :     L  size (MB/node)     time (usec)       GB/s/node    Gflop/s/node
+Grid : Message : 7.513528 s :     8            1.50            5.13          285.70          383.46
+Grid : Message : 7.611173 s :    16           24.00           16.12         1453.49         1950.84
+Grid : Message : 7.727292 s :    24          121.50           68.14         1741.21         2337.01
+Grid : Message : 8.423214 s :    32          384.00          953.81          393.16          527.69
+Grid : Message : 9.513115 s :    40          937.50         2735.24          334.72          449.25
+Grid : Message : 11.589300 s :    48         1944.00         5899.31          321.81          431.92
+Grid : Message : 11.108160 s : ===============================================================================
+Grid : Message : 11.108340 s :  Communications benchmark 
+Grid : Message : 11.108380 s : ===============================================================================
+Grid : Message : 11.108530 s : Benchmarking threaded STENCIL halo exchange in 0 dimensions
+Grid : Message : 11.108550 s : ------------------------------------------
+Grid : Message : 11.108620 s :     L   dir     shm     payload (B)     time (usec) rate (GB/s/node)         std dev             max
+Grid : Message : 11.169150 s : ===============================================================================
+Grid : Message : 11.169230 s :  Check Wilson
+Grid : Message : 11.169240 s : ===============================================================================
+Grid : Message : 11.169380 s : Validating Wilson propagator
+Grid : Message : 11.177850 s : Initialised RNGs
+Grid : Message : 11.328430 s :  Solving by FFT and Feynman rules
+Grid : Message : 11.474530 s :  Solving by Conjugate Gradient (CGNE)
+ConjugageGradient::LogBegin() 
+Grid : Message : 11.548500 s : ConjugateGradient Converged on iteration 73	Computed residual 4.0095988e-09	True residual 4.0095986e-09	Target 1e-08
+Grid : Message : 11.548880 s : 	Solver Elapsed    0.006597 s
+Grid : Message : 11.548930 s :  Taking difference
+Grid : Message : 11.548950 s : Wilson result 53.4199791
+Grid : Message : 11.549100 s : Wilson ref    53.4199791
+Grid : Message : 11.549580 s : ||result - ref||                      4.89555999e-17
+Grid : Message : 11.549600 s : ||result - ref||/||result + ref||     2.29107165e-19
+Grid : Message : 11.552100 s : ===============================================================================
+Grid : Message : 11.552120 s :  fp32 SU(3) fundamental Wilson dslash 4d vectorised
+Grid : Message : 11.554230 s : ===============================================================================
+Grid : Message : 11.554250 s : Benchmark SU(3) DWF on 8^4 local volume 
+Grid : Message : 11.554270 s : * Group family   : SU
+Grid : Message : 11.554280 s : * Nc             : 3
+Grid : Message : 11.554290 s : * Representation : Fundamental
+Grid : Message : 11.554300 s : * Global volume  : 8 8 8 8 
+Grid : Message : 11.554380 s : * Ls             : 1
+Grid : Message : 11.554390 s : * ranks          : 1
+Grid : Message : 11.554410 s : * nodes          : 1
+Grid : Message : 11.554420 s : * ranks/node     : 1
+Grid : Message : 11.554430 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 11.554450 s : * Using 128 threads
+Grid : Message : 11.554560 s : ===============================================================================
+Grid : Message : 11.567210 s : Initialised RNGs
+Grid : Message : 11.600710 s : ------------------------------------------
+Grid : Message : 11.600750 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.601190 s : * Using sequential Comms/Compute
+Grid : Message : 11.601200 s : * SINGLE precision 
+Grid : Message : 11.601210 s : ------------------------------------------
+Grid : Message : 11.640050 s : Deo FlopsPerSite is 1344
+Grid : Message : 11.640120 s : Deo Gflop/s =   401.9 (3.5) 137.6-458.8
+Grid : Message : 11.640170 s : Deo Gflop/s per rank   401.9
+Grid : Message : 11.640190 s : Deo Gflop/s per node   401.9
+Grid : Message : 11.640210 s : ------------------------------------------
+Grid : Message : 11.640220 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.640280 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.640290 s : * SINGLE precision 
+Grid : Message : 11.640300 s : ------------------------------------------
+Grid : Message : 11.700630 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.700660 s : Deo Gflop/s =   250.0 (1.6) 152.9-305.8
+Grid : Message : 11.700700 s : Deo Gflop/s per rank   250.0
+Grid : Message : 11.700720 s : Deo Gflop/s per node   250.0
+Grid : Message : 11.700740 s : ------------------------------------------
+Grid : Message : 11.700760 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.700800 s : * Using sequential Comms/Compute
+Grid : Message : 11.700810 s : * SINGLE precision 
+Grid : Message : 11.700820 s : ------------------------------------------
+Grid : Message : 11.741540 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.741560 s : Deo Gflop/s =   348.3 (3.4) 105.9-458.8
+Grid : Message : 11.741590 s : Deo Gflop/s per rank   348.3
+Grid : Message : 11.741610 s : Deo Gflop/s per node   348.3
+Grid : Message : 11.741630 s : ------------------------------------------
+Grid : Message : 11.741640 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.741670 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.741680 s : * SINGLE precision 
+Grid : Message : 11.741690 s : ------------------------------------------
+Grid : Message : 11.796160 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.796180 s : Deo Gflop/s =   259.8 (1.7) 98.3-305.8
+Grid : Message : 11.796210 s : Deo Gflop/s per rank   259.8
+Grid : Message : 11.796230 s : Deo Gflop/s per node   259.8
+Grid : Message : 11.796250 s : ------------------------------------------
+Grid : Message : 11.796260 s : 8^4 Deo Best  Gflop/s        =   401.9 ; 401.9 per node 
+Grid : Message : 11.796290 s : 8^4 Deo Worst Gflop/s        =   250.0 ; 250.0 per node 
+Grid : Message : 11.796320 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 11.796330 s : 401.9 ; 250.0 ; 348.3 ; 259.8 ; 
+Grid : Message : 11.802950 s : ===============================================================================
+Grid : Message : 11.802970 s : Benchmark SU(3) DWF on 12^4 local volume 
+Grid : Message : 11.802990 s : * Group family   : SU
+Grid : Message : 11.803000 s : * Nc             : 3
+Grid : Message : 11.803010 s : * Representation : Fundamental
+Grid : Message : 11.803020 s : * Global volume  : 12 12 12 12 
+Grid : Message : 11.803070 s : * Ls             : 1
+Grid : Message : 11.803080 s : * ranks          : 1
+Grid : Message : 11.803100 s : * nodes          : 1
+Grid : Message : 11.803110 s : * ranks/node     : 1
+Grid : Message : 11.803120 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 11.803140 s : * Using 128 threads
+Grid : Message : 11.803150 s : ===============================================================================
+Grid : Message : 11.881480 s : Initialised RNGs
+Grid : Message : 11.995280 s : ------------------------------------------
+Grid : Message : 11.995400 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.995570 s : * Using sequential Comms/Compute
+Grid : Message : 11.995580 s : * SINGLE precision 
+Grid : Message : 11.995600 s : ------------------------------------------
+Grid : Message : 11.107342 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.107351 s : Deo Gflop/s =   938.5 (10.2) 302.9-1161.2
+Grid : Message : 11.107357 s : Deo Gflop/s per rank   938.5
+Grid : Message : 11.107359 s : Deo Gflop/s per node   938.5
+Grid : Message : 11.107361 s : ------------------------------------------
+Grid : Message : 11.107362 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.107368 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.107370 s : * SINGLE precision 
+Grid : Message : 11.107371 s : ------------------------------------------
+Grid : Message : 11.115504 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.115507 s : Deo Gflop/s =   879.2 (7.8) 339.9-1071.9
+Grid : Message : 11.115511 s : Deo Gflop/s per rank   879.2
+Grid : Message : 11.115513 s : Deo Gflop/s per node   879.2
+Grid : Message : 11.115515 s : ------------------------------------------
+Grid : Message : 11.115516 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.115520 s : * Using sequential Comms/Compute
+Grid : Message : 11.115521 s : * SINGLE precision 
+Grid : Message : 11.115522 s : ------------------------------------------
+Grid : Message : 11.123250 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.123253 s : Deo Gflop/s =   922.8 (7.2) 480.5-1161.2
+Grid : Message : 11.123262 s : Deo Gflop/s per rank   922.8
+Grid : Message : 11.123264 s : Deo Gflop/s per node   922.8
+Grid : Message : 11.123266 s : ------------------------------------------
+Grid : Message : 11.123267 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.123271 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.123272 s : * SINGLE precision 
+Grid : Message : 11.123273 s : ------------------------------------------
+Grid : Message : 11.131343 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.131346 s : Deo Gflop/s =   884.4 (6.0) 497.7-1071.9
+Grid : Message : 11.131350 s : Deo Gflop/s per rank   884.4
+Grid : Message : 11.131352 s : Deo Gflop/s per node   884.4
+Grid : Message : 11.131354 s : ------------------------------------------
+Grid : Message : 11.131355 s : 12^4 Deo Best  Gflop/s        =   938.5 ; 938.5 per node 
+Grid : Message : 11.131358 s : 12^4 Deo Worst Gflop/s        =   879.2 ; 879.2 per node 
+Grid : Message : 11.131361 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 11.131363 s : 938.5 ; 879.2 ; 922.8 ; 884.4 ; 
+Grid : Message : 11.134105 s : ===============================================================================
+Grid : Message : 11.134109 s : Benchmark SU(3) DWF on 16^4 local volume 
+Grid : Message : 11.134111 s : * Group family   : SU
+Grid : Message : 11.134112 s : * Nc             : 3
+Grid : Message : 11.134113 s : * Representation : Fundamental
+Grid : Message : 11.134114 s : * Global volume  : 16 16 16 16 
+Grid : Message : 11.134122 s : * Ls             : 1
+Grid : Message : 11.134123 s : * ranks          : 1
+Grid : Message : 11.134125 s : * nodes          : 1
+Grid : Message : 11.134127 s : * ranks/node     : 1
+Grid : Message : 11.134128 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 11.134132 s : * Using 128 threads
+Grid : Message : 11.134134 s : ===============================================================================
+Grid : Message : 11.151159 s : Initialised RNGs
+Grid : Message : 11.173091 s : ------------------------------------------
+Grid : Message : 11.173102 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.173121 s : * Using sequential Comms/Compute
+Grid : Message : 11.173122 s : * SINGLE precision 
+Grid : Message : 11.173124 s : ------------------------------------------
+Grid : Message : 11.189876 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.189887 s : Deo Gflop/s =   1379.4 (9.5) 367.0-1518.6
+Grid : Message : 11.189893 s : Deo Gflop/s per rank   1379.4
+Grid : Message : 11.189896 s : Deo Gflop/s per node   1379.4
+Grid : Message : 11.189899 s : ------------------------------------------
+Grid : Message : 11.189900 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.189907 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.189908 s : * SINGLE precision 
+Grid : Message : 11.189919 s : ------------------------------------------
+Grid : Message : 11.202642 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.202645 s : Deo Gflop/s =   1774.8 (5.5) 1223.3-2001.8
+Grid : Message : 11.202649 s : Deo Gflop/s per rank   1774.8
+Grid : Message : 11.202651 s : Deo Gflop/s per node   1774.8
+Grid : Message : 11.202653 s : ------------------------------------------
+Grid : Message : 11.202655 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.202660 s : * Using sequential Comms/Compute
+Grid : Message : 11.202661 s : * SINGLE precision 
+Grid : Message : 11.202662 s : ------------------------------------------
+Grid : Message : 11.219131 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.219134 s : Deo Gflop/s =   1368.4 (5.9) 772.6-1518.6
+Grid : Message : 11.219138 s : Deo Gflop/s per rank   1368.4
+Grid : Message : 11.219140 s : Deo Gflop/s per node   1368.4
+Grid : Message : 11.219142 s : ------------------------------------------
+Grid : Message : 11.219143 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.219147 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.219148 s : * SINGLE precision 
+Grid : Message : 11.219149 s : ------------------------------------------
+Grid : Message : 11.231916 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.231918 s : Deo Gflop/s =   1768.3 (5.5) 1295.3-2001.8
+Grid : Message : 11.231922 s : Deo Gflop/s per rank   1768.3
+Grid : Message : 11.231924 s : Deo Gflop/s per node   1768.3
+Grid : Message : 11.231926 s : ------------------------------------------
+Grid : Message : 11.231928 s : 16^4 Deo Best  Gflop/s        =   1774.8 ; 1774.8 per node 
+Grid : Message : 11.231932 s : 16^4 Deo Worst Gflop/s        =   1368.4 ; 1368.4 per node 
+Grid : Message : 11.231935 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 11.231937 s : 1379.4 ; 1774.8 ; 1368.4 ; 1768.3 ; 
+Grid : Message : 11.239572 s : ===============================================================================
+Grid : Message : 11.239578 s : Benchmark SU(3) DWF on 24^4 local volume 
+Grid : Message : 11.239581 s : * Group family   : SU
+Grid : Message : 11.239582 s : * Nc             : 3
+Grid : Message : 11.239583 s : * Representation : Fundamental
+Grid : Message : 11.239584 s : * Global volume  : 24 24 24 24 
+Grid : Message : 11.239593 s : * Ls             : 1
+Grid : Message : 11.239595 s : * ranks          : 1
+Grid : Message : 11.239597 s : * nodes          : 1
+Grid : Message : 11.239598 s : * ranks/node     : 1
+Grid : Message : 11.239599 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 11.239602 s : * Using 128 threads
+Grid : Message : 11.239604 s : ===============================================================================
+Grid : Message : 11.321620 s : Initialised RNGs
+Grid : Message : 11.412137 s : ------------------------------------------
+Grid : Message : 11.412153 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.412173 s : * Using sequential Comms/Compute
+Grid : Message : 11.412174 s : * SINGLE precision 
+Grid : Message : 11.412175 s : ------------------------------------------
+Grid : Message : 11.512374 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.512400 s : Deo Gflop/s =   1152.7 (2.2) 1008.8-1266.8
+Grid : Message : 11.512407 s : Deo Gflop/s per rank   1152.7
+Grid : Message : 11.512410 s : Deo Gflop/s per node   1152.7
+Grid : Message : 11.512413 s : ------------------------------------------
+Grid : Message : 11.512415 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.512430 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.512432 s : * SINGLE precision 
+Grid : Message : 11.512434 s : ------------------------------------------
+Grid : Message : 11.608372 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.608385 s : Deo Gflop/s =   1187.0 (2.1) 902.6-1245.6
+Grid : Message : 11.608390 s : Deo Gflop/s per rank   1187.0
+Grid : Message : 11.608392 s : Deo Gflop/s per node   1187.0
+Grid : Message : 11.608394 s : ------------------------------------------
+Grid : Message : 11.608396 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.608420 s : * Using sequential Comms/Compute
+Grid : Message : 11.608422 s : * SINGLE precision 
+Grid : Message : 11.608424 s : ------------------------------------------
+Grid : Message : 11.709142 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.709154 s : Deo Gflop/s =   1130.3 (1.8) 982.2-1192.3
+Grid : Message : 11.709159 s : Deo Gflop/s per rank   1130.3
+Grid : Message : 11.709161 s : Deo Gflop/s per node   1130.3
+Grid : Message : 11.709164 s : ------------------------------------------
+Grid : Message : 11.709166 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 11.709176 s : * Using Overlapped Comms/Compute
+Grid : Message : 11.709178 s : * SINGLE precision 
+Grid : Message : 11.709180 s : ------------------------------------------
+Grid : Message : 11.822401 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 11.822415 s : Deo Gflop/s =   1002.7 (2.8) 810.7-1098.3
+Grid : Message : 11.822421 s : Deo Gflop/s per rank   1002.7
+Grid : Message : 11.822424 s : Deo Gflop/s per node   1002.7
+Grid : Message : 11.822427 s : ------------------------------------------
+Grid : Message : 11.822430 s : 24^4 Deo Best  Gflop/s        =   1187.0 ; 1187.0 per node 
+Grid : Message : 11.822435 s : 24^4 Deo Worst Gflop/s        =   1002.7 ; 1002.7 per node 
+Grid : Message : 11.822440 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 11.822442 s : 1152.7 ; 1187.0 ; 1130.3 ; 1002.7 ; 
+Grid : Message : 11.874976 s : ===============================================================================
+Grid : Message : 11.874987 s : Benchmark SU(3) DWF on 32^4 local volume 
+Grid : Message : 11.874991 s : * Group family   : SU
+Grid : Message : 11.874993 s : * Nc             : 3
+Grid : Message : 11.874995 s : * Representation : Fundamental
+Grid : Message : 11.874997 s : * Global volume  : 32 32 32 32 
+Grid : Message : 11.875008 s : * Ls             : 1
+Grid : Message : 11.875010 s : * ranks          : 1
+Grid : Message : 11.875013 s : * nodes          : 1
+Grid : Message : 11.875015 s : * ranks/node     : 1
+Grid : Message : 11.875017 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 11.875020 s : * Using 128 threads
+Grid : Message : 11.875022 s : ===============================================================================
+Grid : Message : 12.133674 s : Initialised RNGs
+Grid : Message : 12.390306 s : ------------------------------------------
+Grid : Message : 12.390323 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 12.390342 s : * Using sequential Comms/Compute
+Grid : Message : 12.390344 s : * SINGLE precision 
+Grid : Message : 12.390345 s : ------------------------------------------
+Grid : Message : 12.959220 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 12.959259 s : Deo Gflop/s =   633.4 (3.6) 170.7-656.1
+Grid : Message : 12.959266 s : Deo Gflop/s per rank   633.4
+Grid : Message : 12.959268 s : Deo Gflop/s per node   633.4
+Grid : Message : 12.959270 s : ------------------------------------------
+Grid : Message : 12.959271 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 12.959287 s : * Using Overlapped Comms/Compute
+Grid : Message : 12.959288 s : * SINGLE precision 
+Grid : Message : 12.959290 s : ------------------------------------------
+Grid : Message : 13.564696 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 13.564716 s : Deo Gflop/s =   593.6 (1.3) 320.0-615.4
+Grid : Message : 13.564723 s : Deo Gflop/s per rank   593.6
+Grid : Message : 13.564726 s : Deo Gflop/s per node   593.6
+Grid : Message : 13.564729 s : ------------------------------------------
+Grid : Message : 13.564731 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 13.564745 s : * Using sequential Comms/Compute
+Grid : Message : 13.564747 s : * SINGLE precision 
+Grid : Message : 13.564749 s : ------------------------------------------
+Grid : Message : 14.149467 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 14.149486 s : Deo Gflop/s =   615.0 (0.4) 586.7-633.7
+Grid : Message : 14.149493 s : Deo Gflop/s per rank   615.0
+Grid : Message : 14.149496 s : Deo Gflop/s per node   615.0
+Grid : Message : 14.149499 s : ------------------------------------------
+Grid : Message : 14.149514 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 14.149527 s : * Using Overlapped Comms/Compute
+Grid : Message : 14.149529 s : * SINGLE precision 
+Grid : Message : 14.149531 s : ------------------------------------------
+Grid : Message : 14.747035 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 14.747054 s : Deo Gflop/s =   601.9 (0.4) 561.0-614.9
+Grid : Message : 14.747061 s : Deo Gflop/s per rank   601.9
+Grid : Message : 14.747063 s : Deo Gflop/s per node   601.9
+Grid : Message : 14.747066 s : ------------------------------------------
+Grid : Message : 14.747068 s : 32^4 Deo Best  Gflop/s        =   633.4 ; 633.4 per node 
+Grid : Message : 14.747072 s : 32^4 Deo Worst Gflop/s        =   593.6 ; 593.6 per node 
+Grid : Message : 14.747075 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 14.747076 s : 633.4 ; 593.6 ; 615.0 ; 601.9 ; 
+Grid : Message : 14.871960 s : ===============================================================================
+Grid : Message : 14.871973 s : Benchmark SU(3) DWF on 48^4 local volume 
+Grid : Message : 14.871976 s : * Group family   : SU
+Grid : Message : 14.871977 s : * Nc             : 3
+Grid : Message : 14.871979 s : * Representation : Fundamental
+Grid : Message : 14.871980 s : * Global volume  : 48 48 48 48 
+Grid : Message : 14.871990 s : * Ls             : 1
+Grid : Message : 14.871992 s : * ranks          : 1
+Grid : Message : 14.871994 s : * nodes          : 1
+Grid : Message : 14.871996 s : * ranks/node     : 1
+Grid : Message : 14.871997 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 14.871999 s : * Using 128 threads
+Grid : Message : 14.872002 s : ===============================================================================
+Grid : Message : 15.878418 s : Initialised RNGs
+Grid : Message : 17.314749 s : ------------------------------------------
+Grid : Message : 17.314768 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 17.314790 s : * Using sequential Comms/Compute
+Grid : Message : 17.314792 s : * SINGLE precision 
+Grid : Message : 17.314793 s : ------------------------------------------
+Grid : Message : 22.425127 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 22.425190 s : Deo Gflop/s =   354.9 (6.1) 43.8-418.8
+Grid : Message : 22.425199 s : Deo Gflop/s per rank   354.9
+Grid : Message : 22.425201 s : Deo Gflop/s per node   354.9
+Grid : Message : 22.425204 s : ------------------------------------------
+Grid : Message : 22.425206 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 22.425225 s : * Using Overlapped Comms/Compute
+Grid : Message : 22.425227 s : * SINGLE precision 
+Grid : Message : 22.425229 s : ------------------------------------------
+Grid : Message : 27.203100 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 27.203124 s : Deo Gflop/s =   380.6 (0.4) 347.3-394.8
+Grid : Message : 27.203132 s : Deo Gflop/s per rank   380.6
+Grid : Message : 27.203134 s : Deo Gflop/s per node   380.6
+Grid : Message : 27.203137 s : ------------------------------------------
+Grid : Message : 27.203139 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 27.203163 s : * Using sequential Comms/Compute
+Grid : Message : 27.203164 s : * SINGLE precision 
+Grid : Message : 27.203165 s : ------------------------------------------
+Grid : Message : 32.911520 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 32.912070 s : Deo Gflop/s =   371.9 (0.5) 272.1-390.8
+Grid : Message : 32.912170 s : Deo Gflop/s per rank   371.9
+Grid : Message : 32.912190 s : Deo Gflop/s per node   371.9
+Grid : Message : 32.912220 s : ------------------------------------------
+Grid : Message : 32.912240 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 32.912450 s : * Using Overlapped Comms/Compute
+Grid : Message : 32.912460 s : * SINGLE precision 
+Grid : Message : 32.912470 s : ------------------------------------------
+Grid : Message : 36.879659 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 36.879683 s : Deo Gflop/s =   379.7 (0.4) 360.4-394.6
+Grid : Message : 36.879690 s : Deo Gflop/s per rank   379.7
+Grid : Message : 36.879724 s : Deo Gflop/s per node   379.7
+Grid : Message : 36.879727 s : ------------------------------------------
+Grid : Message : 36.879728 s : 48^4 Deo Best  Gflop/s        =   380.6 ; 380.6 per node 
+Grid : Message : 36.879732 s : 48^4 Deo Worst Gflop/s        =   354.9 ; 354.9 per node 
+Grid : Message : 36.879735 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 36.879737 s : 354.9 ; 380.6 ; 371.9 ; 379.7 ; 
+Grid : Message : 37.224716 s : ===============================================================================
+Grid : Message : 37.224726 s :  fp32 SU(3) fundamental Domain wall dslash 4d vectorised
+Grid : Message : 37.370066 s : ===============================================================================
+Grid : Message : 37.370073 s : Benchmark SU(3) DWF on 8^4 local volume 
+Grid : Message : 37.370074 s : * Group family   : SU
+Grid : Message : 37.370075 s : * Nc             : 3
+Grid : Message : 37.370076 s : * Representation : Fundamental
+Grid : Message : 37.370077 s : * Global volume  : 8 8 8 8 
+Grid : Message : 37.370085 s : * Ls             : 12
+Grid : Message : 37.370086 s : * ranks          : 1
+Grid : Message : 37.370087 s : * nodes          : 1
+Grid : Message : 37.370088 s : * ranks/node     : 1
+Grid : Message : 37.370089 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 37.370090 s : * Using 128 threads
+Grid : Message : 37.370091 s : ===============================================================================
+Grid : Message : 37.376470 s : Initialised RNGs
+Grid : Message : 37.387499 s : ------------------------------------------
+Grid : Message : 37.387505 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.387525 s : * Using sequential Comms/Compute
+Grid : Message : 37.387526 s : * SINGLE precision 
+Grid : Message : 37.387527 s : ------------------------------------------
+Grid : Message : 37.400851 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.400862 s : Deo Gflop/s =   1274.0 (12.8) 320.7-1501.4
+Grid : Message : 37.400868 s : Deo Gflop/s per rank   1274.0
+Grid : Message : 37.400870 s : Deo Gflop/s per node   1274.0
+Grid : Message : 37.400872 s : ------------------------------------------
+Grid : Message : 37.400873 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.400879 s : * Using Overlapped Comms/Compute
+Grid : Message : 37.400880 s : * SINGLE precision 
+Grid : Message : 37.400881 s : ------------------------------------------
+Grid : Message : 37.412835 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.412838 s : Deo Gflop/s =   1419.8 (10.9) 660.6-1651.5
+Grid : Message : 37.412842 s : Deo Gflop/s per rank   1419.8
+Grid : Message : 37.412844 s : Deo Gflop/s per node   1419.8
+Grid : Message : 37.412846 s : ------------------------------------------
+Grid : Message : 37.412847 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.412851 s : * Using sequential Comms/Compute
+Grid : Message : 37.412852 s : * SINGLE precision 
+Grid : Message : 37.412853 s : ------------------------------------------
+Grid : Message : 37.426222 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.426225 s : Deo Gflop/s =   1264.8 (9.7) 493.0-1501.4
+Grid : Message : 37.426229 s : Deo Gflop/s per rank   1264.8
+Grid : Message : 37.426231 s : Deo Gflop/s per node   1264.8
+Grid : Message : 37.426233 s : ------------------------------------------
+Grid : Message : 37.426234 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.426238 s : * Using Overlapped Comms/Compute
+Grid : Message : 37.426239 s : * SINGLE precision 
+Grid : Message : 37.426240 s : ------------------------------------------
+Grid : Message : 37.437939 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.437941 s : Deo Gflop/s =   1444.9 (14.2) 371.1-1738.4
+Grid : Message : 37.437945 s : Deo Gflop/s per rank   1444.9
+Grid : Message : 37.437947 s : Deo Gflop/s per node   1444.9
+Grid : Message : 37.437949 s : ------------------------------------------
+Grid : Message : 37.437950 s : 8^4 Deo Best  Gflop/s        =   1444.9 ; 1444.9 per node 
+Grid : Message : 37.437953 s : 8^4 Deo Worst Gflop/s        =   1264.8 ; 1264.8 per node 
+Grid : Message : 37.437966 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 37.437968 s : 1274.0 ; 1419.8 ; 1264.8 ; 1444.9 ; 
+Grid : Message : 37.441351 s : ===============================================================================
+Grid : Message : 37.441355 s : Benchmark SU(3) DWF on 12^4 local volume 
+Grid : Message : 37.441357 s : * Group family   : SU
+Grid : Message : 37.441358 s : * Nc             : 3
+Grid : Message : 37.441359 s : * Representation : Fundamental
+Grid : Message : 37.441360 s : * Global volume  : 12 12 12 12 
+Grid : Message : 37.441366 s : * Ls             : 12
+Grid : Message : 37.441367 s : * ranks          : 1
+Grid : Message : 37.441369 s : * nodes          : 1
+Grid : Message : 37.441372 s : * ranks/node     : 1
+Grid : Message : 37.441373 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 37.441375 s : * Using 128 threads
+Grid : Message : 37.441377 s : ===============================================================================
+Grid : Message : 37.469693 s : Initialised RNGs
+Grid : Message : 37.485336 s : ------------------------------------------
+Grid : Message : 37.485341 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.485354 s : * Using sequential Comms/Compute
+Grid : Message : 37.485356 s : * SINGLE precision 
+Grid : Message : 37.485358 s : ------------------------------------------
+Grid : Message : 37.536717 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.536726 s : Deo Gflop/s =   1670.1 (8.5) 516.1-1760.2
+Grid : Message : 37.536732 s : Deo Gflop/s per rank   1670.1
+Grid : Message : 37.536734 s : Deo Gflop/s per node   1670.1
+Grid : Message : 37.536736 s : ------------------------------------------
+Grid : Message : 37.536737 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.536744 s : * Using Overlapped Comms/Compute
+Grid : Message : 37.536745 s : * SINGLE precision 
+Grid : Message : 37.536746 s : ------------------------------------------
+Grid : Message : 37.569672 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.569676 s : Deo Gflop/s =   2593.8 (7.5) 1837.5-2741.2
+Grid : Message : 37.569680 s : Deo Gflop/s per rank   2593.8
+Grid : Message : 37.569682 s : Deo Gflop/s per node   2593.8
+Grid : Message : 37.569684 s : ------------------------------------------
+Grid : Message : 37.569685 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.569690 s : * Using sequential Comms/Compute
+Grid : Message : 37.569691 s : * SINGLE precision 
+Grid : Message : 37.569692 s : ------------------------------------------
+Grid : Message : 37.620720 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.620730 s : Deo Gflop/s =   1672.6 (8.4) 529.2-1760.2
+Grid : Message : 37.620734 s : Deo Gflop/s per rank   1672.6
+Grid : Message : 37.620736 s : Deo Gflop/s per node   1672.6
+Grid : Message : 37.620738 s : ------------------------------------------
+Grid : Message : 37.620739 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.620745 s : * Using Overlapped Comms/Compute
+Grid : Message : 37.620746 s : * SINGLE precision 
+Grid : Message : 37.620747 s : ------------------------------------------
+Grid : Message : 37.653478 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.653482 s : Deo Gflop/s =   2609.1 (6.0) 1857.9-2741.2
+Grid : Message : 37.653486 s : Deo Gflop/s per rank   2609.1
+Grid : Message : 37.653488 s : Deo Gflop/s per node   2609.1
+Grid : Message : 37.653490 s : ------------------------------------------
+Grid : Message : 37.653491 s : 12^4 Deo Best  Gflop/s        =   2609.1 ; 2609.1 per node 
+Grid : Message : 37.653494 s : 12^4 Deo Worst Gflop/s        =   1670.1 ; 1670.1 per node 
+Grid : Message : 37.653497 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 37.653498 s : 1670.1 ; 2593.8 ; 1672.6 ; 2609.1 ; 
+Grid : Message : 37.668608 s : ===============================================================================
+Grid : Message : 37.668613 s : Benchmark SU(3) DWF on 16^4 local volume 
+Grid : Message : 37.668615 s : * Group family   : SU
+Grid : Message : 37.668616 s : * Nc             : 3
+Grid : Message : 37.668617 s : * Representation : Fundamental
+Grid : Message : 37.668628 s : * Global volume  : 16 16 16 16 
+Grid : Message : 37.668635 s : * Ls             : 12
+Grid : Message : 37.668636 s : * ranks          : 1
+Grid : Message : 37.668638 s : * nodes          : 1
+Grid : Message : 37.668640 s : * ranks/node     : 1
+Grid : Message : 37.668642 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 37.668644 s : * Using 128 threads
+Grid : Message : 37.668647 s : ===============================================================================
+Grid : Message : 37.754428 s : Initialised RNGs
+Grid : Message : 37.806227 s : ------------------------------------------
+Grid : Message : 37.806242 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.806261 s : * Using sequential Comms/Compute
+Grid : Message : 37.806262 s : * SINGLE precision 
+Grid : Message : 37.806264 s : ------------------------------------------
+Grid : Message : 37.993702 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 37.993728 s : Deo Gflop/s =   1445.0 (9.6) 359.5-1558.9
+Grid : Message : 37.993735 s : Deo Gflop/s per rank   1445.0
+Grid : Message : 37.993738 s : Deo Gflop/s per node   1445.0
+Grid : Message : 37.993741 s : ------------------------------------------
+Grid : Message : 37.993743 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 37.993759 s : * Using Overlapped Comms/Compute
+Grid : Message : 37.993761 s : * SINGLE precision 
+Grid : Message : 37.993763 s : ------------------------------------------
+Grid : Message : 38.152900 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 38.152917 s : Deo Gflop/s =   1695.6 (2.3) 1413.1-1773.4
+Grid : Message : 38.152923 s : Deo Gflop/s per rank   1695.6
+Grid : Message : 38.152925 s : Deo Gflop/s per node   1695.6
+Grid : Message : 38.152927 s : ------------------------------------------
+Grid : Message : 38.152929 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 38.152942 s : * Using sequential Comms/Compute
+Grid : Message : 38.152943 s : * SINGLE precision 
+Grid : Message : 38.152945 s : ------------------------------------------
+Grid : Message : 38.339777 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 38.339794 s : Deo Gflop/s =   1443.8 (1.2) 1344.7-1518.6
+Grid : Message : 38.339799 s : Deo Gflop/s per rank   1443.8
+Grid : Message : 38.339801 s : Deo Gflop/s per node   1443.8
+Grid : Message : 38.339803 s : ------------------------------------------
+Grid : Message : 38.339805 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 38.339817 s : * Using Overlapped Comms/Compute
+Grid : Message : 38.339824 s : * SINGLE precision 
+Grid : Message : 38.339826 s : ------------------------------------------
+Grid : Message : 38.498785 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 38.498800 s : Deo Gflop/s =   1697.8 (2.4) 1394.4-1773.4
+Grid : Message : 38.498805 s : Deo Gflop/s per rank   1697.8
+Grid : Message : 38.498807 s : Deo Gflop/s per node   1697.8
+Grid : Message : 38.498809 s : ------------------------------------------
+Grid : Message : 38.498810 s : 16^4 Deo Best  Gflop/s        =   1697.8 ; 1697.8 per node 
+Grid : Message : 38.498814 s : 16^4 Deo Worst Gflop/s        =   1443.8 ; 1443.8 per node 
+Grid : Message : 38.498817 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 38.498818 s : 1445.0 ; 1695.6 ; 1443.8 ; 1697.8 ; 
+Grid : Message : 38.547327 s : ===============================================================================
+Grid : Message : 38.547339 s : Benchmark SU(3) DWF on 24^4 local volume 
+Grid : Message : 38.547342 s : * Group family   : SU
+Grid : Message : 38.547343 s : * Nc             : 3
+Grid : Message : 38.547344 s : * Representation : Fundamental
+Grid : Message : 38.547345 s : * Global volume  : 24 24 24 24 
+Grid : Message : 38.547354 s : * Ls             : 12
+Grid : Message : 38.547355 s : * ranks          : 1
+Grid : Message : 38.547357 s : * nodes          : 1
+Grid : Message : 38.547359 s : * ranks/node     : 1
+Grid : Message : 38.547360 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 38.547363 s : * Using 128 threads
+Grid : Message : 38.547366 s : ===============================================================================
+Grid : Message : 38.937706 s : Initialised RNGs
+Grid : Message : 39.231012 s : ------------------------------------------
+Grid : Message : 39.231034 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 39.231055 s : * Using sequential Comms/Compute
+Grid : Message : 39.231056 s : * SINGLE precision 
+Grid : Message : 39.231057 s : ------------------------------------------
+Grid : Message : 40.961678 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 40.961714 s : Deo Gflop/s =   788.7 (2.5) 402.5-846.1
+Grid : Message : 40.961721 s : Deo Gflop/s per rank   788.7
+Grid : Message : 40.961723 s : Deo Gflop/s per node   788.7
+Grid : Message : 40.961726 s : ------------------------------------------
+Grid : Message : 40.961728 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 40.961753 s : * Using Overlapped Comms/Compute
+Grid : Message : 40.961755 s : * SINGLE precision 
+Grid : Message : 40.961757 s : ------------------------------------------
+Grid : Message : 42.608093 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 42.608115 s : Deo Gflop/s =   828.6 (3.5) 280.8-868.1
+Grid : Message : 42.608121 s : Deo Gflop/s per rank   828.6
+Grid : Message : 42.608123 s : Deo Gflop/s per node   828.6
+Grid : Message : 42.608125 s : ------------------------------------------
+Grid : Message : 42.608126 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 42.608143 s : * Using sequential Comms/Compute
+Grid : Message : 42.608144 s : * SINGLE precision 
+Grid : Message : 42.608146 s : ------------------------------------------
+Grid : Message : 44.361001 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 44.361044 s : Deo Gflop/s =   778.2 (3.5) 255.2-807.3
+Grid : Message : 44.361051 s : Deo Gflop/s per rank   778.2
+Grid : Message : 44.361053 s : Deo Gflop/s per node   778.2
+Grid : Message : 44.361056 s : ------------------------------------------
+Grid : Message : 44.361058 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 44.361073 s : * Using Overlapped Comms/Compute
+Grid : Message : 44.361075 s : * SINGLE precision 
+Grid : Message : 44.361077 s : ------------------------------------------
+Grid : Message : 45.999445 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 45.999463 s : Deo Gflop/s =   833.4 (0.3) 818.9-855.9
+Grid : Message : 45.999470 s : Deo Gflop/s per rank   833.4
+Grid : Message : 45.999472 s : Deo Gflop/s per node   833.4
+Grid : Message : 45.999475 s : ------------------------------------------
+Grid : Message : 45.999476 s : 24^4 Deo Best  Gflop/s        =   833.4 ; 833.4 per node 
+Grid : Message : 45.999480 s : 24^4 Deo Worst Gflop/s        =   778.2 ; 778.2 per node 
+Grid : Message : 45.999483 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 45.999491 s : 788.7 ; 828.6 ; 778.2 ; 833.4 ; 
+Grid : Message : 46.285262 s : ===============================================================================
+Grid : Message : 46.285275 s : Benchmark SU(3) DWF on 32^4 local volume 
+Grid : Message : 46.285277 s : * Group family   : SU
+Grid : Message : 46.285278 s : * Nc             : 3
+Grid : Message : 46.285279 s : * Representation : Fundamental
+Grid : Message : 46.285280 s : * Global volume  : 32 32 32 32 
+Grid : Message : 46.285287 s : * Ls             : 12
+Grid : Message : 46.285288 s : * ranks          : 1
+Grid : Message : 46.285289 s : * nodes          : 1
+Grid : Message : 46.285290 s : * ranks/node     : 1
+Grid : Message : 46.285291 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 46.285292 s : * Using 128 threads
+Grid : Message : 46.285293 s : ===============================================================================
+Grid : Message : 47.578492 s : Initialised RNGs
+Grid : Message : 48.585711 s : ------------------------------------------
+Grid : Message : 48.585729 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 48.585749 s : * Using sequential Comms/Compute
+Grid : Message : 48.585750 s : * SINGLE precision 
+Grid : Message : 48.585751 s : ------------------------------------------
+Grid : Message : 54.736277 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 54.736336 s : Deo Gflop/s =   700.7 (1.6) 467.8-757.6
+Grid : Message : 54.736344 s : Deo Gflop/s per rank   700.7
+Grid : Message : 54.736346 s : Deo Gflop/s per node   700.7
+Grid : Message : 54.736349 s : ------------------------------------------
+Grid : Message : 54.736351 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 54.736376 s : * Using Overlapped Comms/Compute
+Grid : Message : 54.736378 s : * SINGLE precision 
+Grid : Message : 54.736380 s : ------------------------------------------
+Grid : Message : 60.690583 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 60.690624 s : Deo Gflop/s =   725.2 (0.8) 482.9-748.6
+Grid : Message : 60.690633 s : Deo Gflop/s per rank   725.2
+Grid : Message : 60.690635 s : Deo Gflop/s per node   725.2
+Grid : Message : 60.690638 s : ------------------------------------------
+Grid : Message : 60.690640 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 60.690666 s : * Using sequential Comms/Compute
+Grid : Message : 60.690667 s : * SINGLE precision 
+Grid : Message : 60.690669 s : ------------------------------------------
+Grid : Message : 66.879749 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 66.879786 s : Deo Gflop/s =   696.5 (0.4) 593.5-710.0
+Grid : Message : 66.879795 s : Deo Gflop/s per rank   696.5
+Grid : Message : 66.879798 s : Deo Gflop/s per node   696.5
+Grid : Message : 66.879801 s : ------------------------------------------
+Grid : Message : 66.879803 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 66.879823 s : * Using Overlapped Comms/Compute
+Grid : Message : 66.879825 s : * SINGLE precision 
+Grid : Message : 66.879827 s : ------------------------------------------
+Grid : Message : 72.821716 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 72.821743 s : Deo Gflop/s =   725.9 (0.3) 663.5-740.2
+Grid : Message : 72.821750 s : Deo Gflop/s per rank   725.9
+Grid : Message : 72.821753 s : Deo Gflop/s per node   725.9
+Grid : Message : 72.821756 s : ------------------------------------------
+Grid : Message : 72.821757 s : 32^4 Deo Best  Gflop/s        =   725.9 ; 725.9 per node 
+Grid : Message : 72.821761 s : 32^4 Deo Worst Gflop/s        =   696.5 ; 696.5 per node 
+Grid : Message : 72.821764 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 72.821765 s : 700.7 ; 725.2 ; 696.5 ; 725.9 ; 
+Grid : Message : 73.577537 s : ===============================================================================
+Grid : Message : 73.577550 s : Benchmark SU(3) DWF on 48^4 local volume 
+Grid : Message : 73.577552 s : * Group family   : SU
+Grid : Message : 73.577553 s : * Nc             : 3
+Grid : Message : 73.577554 s : * Representation : Fundamental
+Grid : Message : 73.577555 s : * Global volume  : 48 48 48 48 
+Grid : Message : 73.577562 s : * Ls             : 12
+Grid : Message : 73.577563 s : * ranks          : 1
+Grid : Message : 73.577564 s : * nodes          : 1
+Grid : Message : 73.577565 s : * ranks/node     : 1
+Grid : Message : 73.577566 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 73.577567 s : * Using 128 threads
+Grid : Message : 73.577568 s : ===============================================================================
+Grid : Message : 79.822379 s : Initialised RNGs
+Grid : Message : 84.745590 s : ------------------------------------------
+Grid : Message : 84.745616 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 84.745645 s : * Using sequential Comms/Compute
+Grid : Message : 84.745647 s : * SINGLE precision 
+Grid : Message : 84.745649 s : ------------------------------------------
+Grid : Message : 122.966623 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 122.966678 s : Deo Gflop/s =   571.1 (0.1) 542.7-586.7
+Grid : Message : 122.966689 s : Deo Gflop/s per rank   571.1
+Grid : Message : 122.966691 s : Deo Gflop/s per node   571.1
+Grid : Message : 122.966694 s : ------------------------------------------
+Grid : Message : 122.966695 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 122.966717 s : * Using Overlapped Comms/Compute
+Grid : Message : 122.966718 s : * SINGLE precision 
+Grid : Message : 122.966720 s : ------------------------------------------
+Grid : Message : 161.310045 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 161.310106 s : Deo Gflop/s =   569.4 (0.2) 496.6-571.2
+Grid : Message : 161.310117 s : Deo Gflop/s per rank   569.4
+Grid : Message : 161.310119 s : Deo Gflop/s per node   569.4
+Grid : Message : 161.310121 s : ------------------------------------------
+Grid : Message : 161.310122 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 161.310144 s : * Using sequential Comms/Compute
+Grid : Message : 161.310145 s : * SINGLE precision 
+Grid : Message : 161.310146 s : ------------------------------------------
+Grid : Message : 199.597754 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 199.597801 s : Deo Gflop/s =   570.2 (0.3) 495.7-572.4
+Grid : Message : 199.597811 s : Deo Gflop/s per rank   570.2
+Grid : Message : 199.597813 s : Deo Gflop/s per node   570.2
+Grid : Message : 199.597815 s : ------------------------------------------
+Grid : Message : 199.597816 s : * Using GENERIC Nc Grid::WilsonKernels
+Grid : Message : 199.597837 s : * Using Overlapped Comms/Compute
+Grid : Message : 199.597838 s : * SINGLE precision 
+Grid : Message : 199.597839 s : ------------------------------------------
+Grid : Message : 237.956680 s : Deo FlopsPerSite is 1344.0
+Grid : Message : 237.956735 s : Deo Gflop/s =   569.1 (0.1) 541.7-571.0
+Grid : Message : 237.956746 s : Deo Gflop/s per rank   569.1
+Grid : Message : 237.956748 s : Deo Gflop/s per node   569.1
+Grid : Message : 237.956750 s : ------------------------------------------
+Grid : Message : 237.956751 s : 48^4 Deo Best  Gflop/s        =   571.1 ; 571.1 per node 
+Grid : Message : 237.956755 s : 48^4 Deo Worst Gflop/s        =   569.1 ; 569.1 per node 
+Grid : Message : 237.956758 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 237.956760 s : 571.1 ; 569.4 ; 570.2 ; 569.1 ; 
+Grid : Message : 241.587027 s : ===============================================================================
+Grid : Message : 241.587045 s :  fp32 SU(3) fundamental Improved Staggered dslash 4d vectorised
+Grid : Message : 241.587242 s : ===============================================================================
+Grid : Message : 241.587243 s : Benchmark SU(3) ImprovedStaggered on 8^4 local volume 
+Grid : Message : 241.587245 s : * Group family   : SU
+Grid : Message : 241.587246 s : * Nc             : 3
+Grid : Message : 241.587247 s : * Representation : Fundamental
+Grid : Message : 241.587248 s : * Global volume  : 8 8 8 8 
+Grid : Message : 241.587254 s : * ranks          : 1
+Grid : Message : 241.587255 s : * nodes          : 1
+Grid : Message : 241.587256 s : * ranks/node     : 1
+Grid : Message : 241.587257 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 241.587258 s : * Using 128 threads
+Grid : Message : 241.587259 s : ===============================================================================
+Grid : Message : 241.588645 s : Initialised RNGs
+Grid : Message : 241.837583 s : ------------------------------------------
+Grid : Message : 241.837596 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.837619 s : * Using sequential Comms/Compute
+Grid : Message : 241.837620 s : * SINGLE precision 
+Grid : Message : 241.837621 s : ------------------------------------------
+Grid : Message : 241.841493 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.841505 s : Deo Gflop/s =   313.1 (4.4) 83.8-391.2
+Grid : Message : 241.841511 s : Deo Gflop/s per rank   313.1
+Grid : Message : 241.841513 s : Deo Gflop/s per node   313.1
+Grid : Message : 241.841515 s : ------------------------------------------
+Grid : Message : 241.841516 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.841521 s : * Using Overlapped Comms/Compute
+Grid : Message : 241.841522 s : * SINGLE precision 
+Grid : Message : 241.841523 s : ------------------------------------------
+Grid : Message : 241.847817 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.847819 s : Deo Gflop/s =   193.7 (1.7) 75.7-234.7
+Grid : Message : 241.847823 s : Deo Gflop/s per rank   193.7
+Grid : Message : 241.847825 s : Deo Gflop/s per node   193.7
+Grid : Message : 241.847838 s : ------------------------------------------
+Grid : Message : 241.847839 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.847843 s : * Using sequential Comms/Compute
+Grid : Message : 241.847844 s : * SINGLE precision 
+Grid : Message : 241.847845 s : ------------------------------------------
+Grid : Message : 241.852063 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.852066 s : Deo Gflop/s =   288.8 (4.6) 73.3-391.2
+Grid : Message : 241.852069 s : Deo Gflop/s per rank   288.8
+Grid : Message : 241.852071 s : Deo Gflop/s per node   288.8
+Grid : Message : 241.852073 s : ------------------------------------------
+Grid : Message : 241.852074 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.852077 s : * Using Overlapped Comms/Compute
+Grid : Message : 241.852078 s : * SINGLE precision 
+Grid : Message : 241.852079 s : ------------------------------------------
+Grid : Message : 241.857769 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.857771 s : Deo Gflop/s =   212.6 (1.7) 71.1-234.7
+Grid : Message : 241.857774 s : Deo Gflop/s per rank   212.6
+Grid : Message : 241.857776 s : Deo Gflop/s per node   212.6
+Grid : Message : 241.857778 s : ------------------------------------------
+Grid : Message : 241.857779 s : 8^4 Deo Best  Gflop/s        =   313.1 ; 313.1 per node 
+Grid : Message : 241.857782 s : 8^4 Deo Worst Gflop/s        =   193.7 ; 193.7 per node 
+Grid : Message : 241.857785 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 241.857786 s : 313.1 ; 193.7 ; 288.8 ; 212.6 ; 
+Grid : Message : 241.859795 s : ===============================================================================
+Grid : Message : 241.859799 s : Benchmark SU(3) ImprovedStaggered on 12^4 local volume 
+Grid : Message : 241.859802 s : * Group family   : SU
+Grid : Message : 241.859803 s : * Nc             : 3
+Grid : Message : 241.859804 s : * Representation : Fundamental
+Grid : Message : 241.859805 s : * Global volume  : 12 12 12 12 
+Grid : Message : 241.859814 s : * ranks          : 1
+Grid : Message : 241.859816 s : * nodes          : 1
+Grid : Message : 241.859818 s : * ranks/node     : 1
+Grid : Message : 241.859819 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 241.859821 s : * Using 128 threads
+Grid : Message : 241.859823 s : ===============================================================================
+Grid : Message : 241.864398 s : Initialised RNGs
+Grid : Message : 241.872895 s : ------------------------------------------
+Grid : Message : 241.872899 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.872923 s : * Using sequential Comms/Compute
+Grid : Message : 241.872924 s : * SINGLE precision 
+Grid : Message : 241.872925 s : ------------------------------------------
+Grid : Message : 241.881553 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.881558 s : Deo Gflop/s =   706.5 (5.5) 289.8-848.7
+Grid : Message : 241.881563 s : Deo Gflop/s per rank   706.5
+Grid : Message : 241.881565 s : Deo Gflop/s per node   706.5
+Grid : Message : 241.881567 s : ------------------------------------------
+Grid : Message : 241.881568 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.881573 s : * Using Overlapped Comms/Compute
+Grid : Message : 241.881574 s : * SINGLE precision 
+Grid : Message : 241.881575 s : ------------------------------------------
+Grid : Message : 241.890263 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.890266 s : Deo Gflop/s =   701.4 (5.2) 349.5-848.7
+Grid : Message : 241.890270 s : Deo Gflop/s per rank   701.4
+Grid : Message : 241.890272 s : Deo Gflop/s per node   701.4
+Grid : Message : 241.890274 s : ------------------------------------------
+Grid : Message : 241.890276 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.890280 s : * Using sequential Comms/Compute
+Grid : Message : 241.890281 s : * SINGLE precision 
+Grid : Message : 241.890282 s : ------------------------------------------
+Grid : Message : 241.899156 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.899159 s : Deo Gflop/s =   685.5 (7.4) 204.9-848.7
+Grid : Message : 241.899170 s : Deo Gflop/s per rank   685.5
+Grid : Message : 241.899172 s : Deo Gflop/s per node   685.5
+Grid : Message : 241.899174 s : ------------------------------------------
+Grid : Message : 241.899175 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.899179 s : * Using Overlapped Comms/Compute
+Grid : Message : 241.899180 s : * SINGLE precision 
+Grid : Message : 241.899181 s : ------------------------------------------
+Grid : Message : 241.908050 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.908052 s : Deo Gflop/s =   687.7 (4.8) 349.5-848.7
+Grid : Message : 241.908055 s : Deo Gflop/s per rank   687.7
+Grid : Message : 241.908057 s : Deo Gflop/s per node   687.7
+Grid : Message : 241.908059 s : ------------------------------------------
+Grid : Message : 241.908060 s : 12^4 Deo Best  Gflop/s        =   706.5 ; 706.5 per node 
+Grid : Message : 241.908063 s : 12^4 Deo Worst Gflop/s        =   685.5 ; 685.5 per node 
+Grid : Message : 241.908066 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 241.908067 s : 706.5 ; 701.4 ; 685.5 ; 687.7 ; 
+Grid : Message : 241.914331 s : ===============================================================================
+Grid : Message : 241.914335 s : Benchmark SU(3) ImprovedStaggered on 16^4 local volume 
+Grid : Message : 241.914337 s : * Group family   : SU
+Grid : Message : 241.914338 s : * Nc             : 3
+Grid : Message : 241.914339 s : * Representation : Fundamental
+Grid : Message : 241.914340 s : * Global volume  : 16 16 16 16 
+Grid : Message : 241.914347 s : * ranks          : 1
+Grid : Message : 241.914349 s : * nodes          : 1
+Grid : Message : 241.914350 s : * ranks/node     : 1
+Grid : Message : 241.914351 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 241.914353 s : * Using 128 threads
+Grid : Message : 241.914356 s : ===============================================================================
+Grid : Message : 241.928578 s : Initialised RNGs
+Grid : Message : 241.954966 s : ------------------------------------------
+Grid : Message : 241.954972 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.954988 s : * Using sequential Comms/Compute
+Grid : Message : 241.954989 s : * SINGLE precision 
+Grid : Message : 241.954991 s : ------------------------------------------
+Grid : Message : 241.974382 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.974390 s : Deo Gflop/s =   999.0 (4.3) 528.9-1104.5
+Grid : Message : 241.974396 s : Deo Gflop/s per rank   999.0
+Grid : Message : 241.974398 s : Deo Gflop/s per node   999.0
+Grid : Message : 241.974400 s : ------------------------------------------
+Grid : Message : 241.974401 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.974407 s : * Using Overlapped Comms/Compute
+Grid : Message : 241.974408 s : * SINGLE precision 
+Grid : Message : 241.974409 s : ------------------------------------------
+Grid : Message : 241.987916 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 241.987919 s : Deo Gflop/s =   1433.3 (8.9) 658.8-1706.9
+Grid : Message : 241.987923 s : Deo Gflop/s per rank   1433.3
+Grid : Message : 241.987925 s : Deo Gflop/s per node   1433.3
+Grid : Message : 241.987927 s : ------------------------------------------
+Grid : Message : 241.987928 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 241.987932 s : * Using sequential Comms/Compute
+Grid : Message : 241.987933 s : * SINGLE precision 
+Grid : Message : 241.987935 s : ------------------------------------------
+Grid : Message : 242.696300 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 242.696700 s : Deo Gflop/s =   1007.8 (3.3) 736.3-1104.5
+Grid : Message : 242.697100 s : Deo Gflop/s per rank   1007.8
+Grid : Message : 242.697300 s : Deo Gflop/s per node   1007.8
+Grid : Message : 242.697500 s : ------------------------------------------
+Grid : Message : 242.697600 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 242.698000 s : * Using Overlapped Comms/Compute
+Grid : Message : 242.698100 s : * SINGLE precision 
+Grid : Message : 242.698200 s : ------------------------------------------
+Grid : Message : 242.202930 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 242.202960 s : Deo Gflop/s =   1456.4 (7.1) 938.8-1706.9
+Grid : Message : 242.203000 s : Deo Gflop/s per rank   1456.4
+Grid : Message : 242.203020 s : Deo Gflop/s per node   1456.4
+Grid : Message : 242.203040 s : ------------------------------------------
+Grid : Message : 242.203050 s : 16^4 Deo Best  Gflop/s        =   1456.4 ; 1456.4 per node 
+Grid : Message : 242.203080 s : 16^4 Deo Worst Gflop/s        =   999.0 ; 999.0 per node 
+Grid : Message : 242.203110 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 242.203120 s : 999.0 ; 1433.3 ; 1007.8 ; 1456.4 ; 
+Grid : Message : 242.347470 s : ===============================================================================
+Grid : Message : 242.347530 s : Benchmark SU(3) ImprovedStaggered on 24^4 local volume 
+Grid : Message : 242.347570 s : * Group family   : SU
+Grid : Message : 242.347590 s : * Nc             : 3
+Grid : Message : 242.347620 s : * Representation : Fundamental
+Grid : Message : 242.347650 s : * Global volume  : 24 24 24 24 
+Grid : Message : 242.347720 s : * ranks          : 1
+Grid : Message : 242.347750 s : * nodes          : 1
+Grid : Message : 242.347770 s : * ranks/node     : 1
+Grid : Message : 242.347800 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 242.347820 s : * Using 128 threads
+Grid : Message : 242.347850 s : ===============================================================================
+Grid : Message : 242.101196 s : Initialised RNGs
+Grid : Message : 242.282920 s : ------------------------------------------
+Grid : Message : 242.282934 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 242.282955 s : * Using sequential Comms/Compute
+Grid : Message : 242.282957 s : * SINGLE precision 
+Grid : Message : 242.282959 s : ------------------------------------------
+Grid : Message : 242.440091 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 242.440119 s : Deo Gflop/s =   620.7 (1.1) 520.8-679.0
+Grid : Message : 242.440126 s : Deo Gflop/s per rank   620.7
+Grid : Message : 242.440129 s : Deo Gflop/s per node   620.7
+Grid : Message : 242.440133 s : ------------------------------------------
+Grid : Message : 242.440135 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 242.440149 s : * Using Overlapped Comms/Compute
+Grid : Message : 242.440151 s : * SINGLE precision 
+Grid : Message : 242.440153 s : ------------------------------------------
+Grid : Message : 242.593544 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 242.593565 s : Deo Gflop/s =   632.5 (1.8) 335.3-676.5
+Grid : Message : 242.593570 s : Deo Gflop/s per rank   632.5
+Grid : Message : 242.593572 s : Deo Gflop/s per node   632.5
+Grid : Message : 242.593575 s : ------------------------------------------
+Grid : Message : 242.593576 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 242.593590 s : * Using sequential Comms/Compute
+Grid : Message : 242.593591 s : * SINGLE precision 
+Grid : Message : 242.593593 s : ------------------------------------------
+Grid : Message : 242.750058 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 242.750075 s : Deo Gflop/s =   620.2 (0.8) 532.5-655.5
+Grid : Message : 242.750082 s : Deo Gflop/s per rank   620.2
+Grid : Message : 242.750085 s : Deo Gflop/s per node   620.2
+Grid : Message : 242.750088 s : ------------------------------------------
+Grid : Message : 242.750090 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 242.750103 s : * Using Overlapped Comms/Compute
+Grid : Message : 242.750105 s : * SINGLE precision 
+Grid : Message : 242.750107 s : ------------------------------------------
+Grid : Message : 242.902714 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 242.902732 s : Deo Gflop/s =   635.8 (0.9) 562.4-679.0
+Grid : Message : 242.902739 s : Deo Gflop/s per rank   635.8
+Grid : Message : 242.902742 s : Deo Gflop/s per node   635.8
+Grid : Message : 242.902745 s : ------------------------------------------
+Grid : Message : 242.902746 s : 24^4 Deo Best  Gflop/s        =   635.8 ; 635.8 per node 
+Grid : Message : 242.902750 s : 24^4 Deo Worst Gflop/s        =   620.2 ; 620.2 per node 
+Grid : Message : 242.902769 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 242.902770 s : 620.7 ; 632.5 ; 620.2 ; 635.8 ; 
+Grid : Message : 242.940106 s : ===============================================================================
+Grid : Message : 242.940118 s : Benchmark SU(3) ImprovedStaggered on 32^4 local volume 
+Grid : Message : 242.940122 s : * Group family   : SU
+Grid : Message : 242.940124 s : * Nc             : 3
+Grid : Message : 242.940126 s : * Representation : Fundamental
+Grid : Message : 242.940128 s : * Global volume  : 32 32 32 32 
+Grid : Message : 242.940138 s : * ranks          : 1
+Grid : Message : 242.940140 s : * nodes          : 1
+Grid : Message : 242.940142 s : * ranks/node     : 1
+Grid : Message : 242.940144 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 242.940147 s : * Using 128 threads
+Grid : Message : 242.940150 s : ===============================================================================
+Grid : Message : 243.153092 s : Initialised RNGs
+Grid : Message : 243.564384 s : ------------------------------------------
+Grid : Message : 243.564408 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 243.564431 s : * Using sequential Comms/Compute
+Grid : Message : 243.564433 s : * SINGLE precision 
+Grid : Message : 243.564435 s : ------------------------------------------
+Grid : Message : 244.425612 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 244.425641 s : Deo Gflop/s =   356.0 (0.6) 228.9-366.1
+Grid : Message : 244.425650 s : Deo Gflop/s per rank   356.0
+Grid : Message : 244.425653 s : Deo Gflop/s per node   356.0
+Grid : Message : 244.425657 s : ------------------------------------------
+Grid : Message : 244.425659 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 244.425675 s : * Using Overlapped Comms/Compute
+Grid : Message : 244.425677 s : * SINGLE precision 
+Grid : Message : 244.425679 s : ------------------------------------------
+Grid : Message : 245.304105 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 245.304123 s : Deo Gflop/s =   349.1 (0.2) 305.6-356.8
+Grid : Message : 245.304129 s : Deo Gflop/s per rank   349.1
+Grid : Message : 245.304131 s : Deo Gflop/s per node   349.1
+Grid : Message : 245.304134 s : ------------------------------------------
+Grid : Message : 245.304135 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 245.304149 s : * Using sequential Comms/Compute
+Grid : Message : 245.304151 s : * SINGLE precision 
+Grid : Message : 245.304153 s : ------------------------------------------
+Grid : Message : 246.175307 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 246.175326 s : Deo Gflop/s =   351.7 (0.5) 228.8-362.8
+Grid : Message : 246.175333 s : Deo Gflop/s per rank   351.7
+Grid : Message : 246.175335 s : Deo Gflop/s per node   351.7
+Grid : Message : 246.175338 s : ------------------------------------------
+Grid : Message : 246.175339 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 246.175351 s : * Using Overlapped Comms/Compute
+Grid : Message : 246.175353 s : * SINGLE precision 
+Grid : Message : 246.175355 s : ------------------------------------------
+Grid : Message : 247.531820 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 247.532000 s : Deo Gflop/s =   349.1 (0.1) 307.3-353.8
+Grid : Message : 247.532060 s : Deo Gflop/s per rank   349.1
+Grid : Message : 247.532090 s : Deo Gflop/s per node   349.1
+Grid : Message : 247.532120 s : ------------------------------------------
+Grid : Message : 247.532130 s : 32^4 Deo Best  Gflop/s        =   356.0 ; 356.0 per node 
+Grid : Message : 247.532170 s : 32^4 Deo Worst Gflop/s        =   349.1 ; 349.1 per node 
+Grid : Message : 247.532200 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 247.532210 s : 356.0 ; 349.1 ; 351.7 ; 349.1 ; 
+Grid : Message : 247.188897 s : ===============================================================================
+Grid : Message : 247.188912 s : Benchmark SU(3) ImprovedStaggered on 48^4 local volume 
+Grid : Message : 247.188915 s : * Group family   : SU
+Grid : Message : 247.188916 s : * Nc             : 3
+Grid : Message : 247.188930 s : * Representation : Fundamental
+Grid : Message : 247.188932 s : * Global volume  : 48 48 48 48 
+Grid : Message : 247.188943 s : * ranks          : 1
+Grid : Message : 247.188945 s : * nodes          : 1
+Grid : Message : 247.188947 s : * ranks/node     : 1
+Grid : Message : 247.188948 s : * ranks geom     : 1 1 1 1 
+Grid : Message : 247.188950 s : * Using 128 threads
+Grid : Message : 247.188953 s : ===============================================================================
+Grid : Message : 248.144130 s : Initialised RNGs
+Grid : Message : 250.501554 s : ------------------------------------------
+Grid : Message : 250.501582 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 250.501622 s : * Using sequential Comms/Compute
+Grid : Message : 250.501624 s : * SINGLE precision 
+Grid : Message : 250.501626 s : ------------------------------------------
+Grid : Message : 255.108163 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 255.108198 s : Deo Gflop/s =   336.8 (0.5) 215.6-344.7
+Grid : Message : 255.108206 s : Deo Gflop/s per rank   336.8
+Grid : Message : 255.108208 s : Deo Gflop/s per node   336.8
+Grid : Message : 255.108211 s : ------------------------------------------
+Grid : Message : 255.108213 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 255.108237 s : * Using Overlapped Comms/Compute
+Grid : Message : 255.108238 s : * SINGLE precision 
+Grid : Message : 255.108240 s : ------------------------------------------
+Grid : Message : 259.943345 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 259.943401 s : Deo Gflop/s =   320.7 (2.5) 82.3-330.8
+Grid : Message : 259.943411 s : Deo Gflop/s per rank   320.7
+Grid : Message : 259.943413 s : Deo Gflop/s per node   320.7
+Grid : Message : 259.943415 s : ------------------------------------------
+Grid : Message : 259.943416 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 259.943436 s : * Using sequential Comms/Compute
+Grid : Message : 259.943437 s : * SINGLE precision 
+Grid : Message : 259.943438 s : ------------------------------------------
+Grid : Message : 264.537515 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 264.537540 s : Deo Gflop/s =   337.6 (0.1) 307.8-339.7
+Grid : Message : 264.537548 s : Deo Gflop/s per rank   337.6
+Grid : Message : 264.537550 s : Deo Gflop/s per node   337.6
+Grid : Message : 264.537553 s : ------------------------------------------
+Grid : Message : 264.537554 s : * Using GENERIC Nc Grid::StaggeredKernels
+Grid : Message : 264.537571 s : * Using Overlapped Comms/Compute
+Grid : Message : 264.537572 s : * SINGLE precision 
+Grid : Message : 264.537574 s : ------------------------------------------
+Grid : Message : 269.284908 s : Deo FlopsPerSite is 1146.0
+Grid : Message : 269.284952 s : Deo Gflop/s =   326.8 (0.6) 177.1-330.1
+Grid : Message : 269.284960 s : Deo Gflop/s per rank   326.8
+Grid : Message : 269.284962 s : Deo Gflop/s per node   326.8
+Grid : Message : 269.284964 s : ------------------------------------------
+Grid : Message : 269.284965 s : 48^4 Deo Best  Gflop/s        =   337.6 ; 337.6 per node 
+Grid : Message : 269.284968 s : 48^4 Deo Worst Gflop/s        =   320.7 ; 320.7 per node 
+Grid : Message : 269.284971 s : G/S/C ; G/O/C ; G/S/S ; G/O/S 
+Grid : Message : 269.284973 s : 336.8 ; 320.7 ; 337.6 ; 326.8 ; 
+Grid : Message : 269.946950 s : ===============================================================================
+Grid : Message : 269.946963 s : Gflop/s/node Summary table Ls=12
+Grid : Message : 269.946964 s :  * PRECISION: FP32
+Grid : Message : 269.946965 s : ===============================================================================
+Grid : Message : 269.946993 s :     L            Wilson               DWF         Staggered
+Grid : Message : 269.947084 s :     8            401.94           1444.89            313.10
+Grid : Message : 269.947089 s :    12            938.48           2609.15            706.49
+Grid : Message : 269.947092 s :    16           1774.81           1697.78           1456.41
+Grid : Message : 269.947095 s :    24           1187.03            833.43            635.82
+Grid : Message : 269.947098 s :    32            633.38            725.90            355.99
+Grid : Message : 269.947101 s :    48            380.57            571.05            337.62
+Grid : Message : 269.947102 s : ===============================================================================
+Grid : Message : 269.947112 s :  Comparison point     result: 779.7 Gflop/s per node
+Grid : Message : 269.947113 s :  Comparison point is 0.5*(725.9+833.4) 
+Grid : Message : 269.947114 s : ===============================================================================
+Grid : Message : 269.947150 s : writing benchmark results to result.json
+Grid : Message : 269.950342 s : *******************************************
+Grid : Message : 269.950343 s : ******* Grid Finalize                ******
+Grid : Message : 269.950344 s : *******************************************
