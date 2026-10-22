@@ -146,6 +146,13 @@ TODO (no Grid data).
 - **Clang:** pixi clang 20.1.8 links against a glibc 2.17 sysroot and cannot link COSMA's
   openmpi (needs glibc 2.34). Clang configs use `CXX="clang++ --sysroot=/ --gcc-toolchain=/cosma/local/gcc/14.1.0"`
   (gcc 14.1 libstdc++, LLVM libomp from pixi). Verified with an MPI+OpenMP test program.
+- **`tune-unroll` / `tune-asm` withdrawn (Thu 22:02):** Benchmark_Grid c7457a8 hardcodes
+  `OptGeneric` in all four Dslash cases (`Benchmark-Grid/benchmarks/DeoFlops.hpp:218-232`), overwriting
+  Grid's `--dslash-unroll/--dslash-asm`. Every `grid.out` says `Using GENERIC Nc` (48×), with or without the
+  flag. Changing it needs a source edit (out of scope), so the kernel cannot be tuned. Cancelled my
+  pending/running 12208220, 12208232, 12208245, 12208268. Finished 12208211_32 and 12208212_64 stay
+  in `results/*/grid-tune-unroll/` and must be read as **base repeats run with a no-op flag**, not as a
+  kernel comparison.
 - **`--dslash-generic` dropped:** it is Grid's default (`WilsonKernelsStatic::Opt = OptGeneric`), so
   `tune-generic` would duplicate `tune-base`. Candidates: `--dslash-unroll` (both), `--dslash-asm` (DINE2).
 - **Benchmark build:** grid-benchmark compiles 18 instantiation files (Sp4/SU4, ~9 min each,
