@@ -34,6 +34,8 @@ def runs(node_glob, exp_glob):
 def write(name, rows):
     OUT.mkdir(parents=True, exist_ok=True)
     if not rows:
+        # Do not leave an old plot input behind when the source runs disappear.
+        (OUT / name).unlink(missing_ok=True)
         print(f"{name}: no data")
         return
     keys = list(dict.fromkeys(k for r in rows for k in r))
@@ -68,22 +70,50 @@ def _find_results(obj, out):
             _find_results(v, out)
 
 
+def grid_results(data):
+    """Select one per-L result source, avoiding duplicate flops/results entries."""
+    if isinstance(data, dict):
+        for name in ("results", "flops"):
+            if name in data:
+                found = []
+                _find_results(data[name], found)
+                if found:
+                    return found
+    found = []
+    _find_results(data, found)
+    return found
+
+
 def grid():
     flops, axpy = [], []
     for d in runs("*", "grid*"):
         node, exp, job = d.parts[-3:]
         m = meta(d)
-        threads = int(re.search(r"T=(\d+)", m.get("args", "T=0")).group(1))
+        args = m.get("args", "")
+        t = re.search(r"(?:^|\s)T=(\d+)(?:\s|$)", args)
+        if t is None:
+            print(f"SKIP {d}: no T=... in meta.txt", file=sys.stderr)
+            continue
+        threads = int(t.group(1))
+        numa = re.search(r"(?:^|\s)NUMACTL=(\S*)", args)
         for jf in d.glob("result*.json"):
             try:
-                data = json.load(open(jf))
-            except json.JSONDecodeError:
+                with jf.open() as f:
+                    data = json.load(f)
+            except (json.JSONDecodeError, OSError):
+                print(f"SKIP {jf}: incomplete/unreadable JSON", file=sys.stderr)
                 continue  # run killed mid-write
             base = {"node": node, "experiment": exp, "job": job, "threads": threads,
-                    "file": jf.name, "git": m.get("git", "")}
-            found = []
-            _find_results(data, found)
-            for r in found:
+                    "file": jf.name, "git": m.get("git", ""),
+                    "config": m.get("GRID_CONFIG", ""),
+                    "bind": m.get("OMP_PROC_BIND", ""),
+                    "numactl": numa.group(1) if numa else ""}
+            seen = set()
+            for r in grid_results(data):
+                key = (r["L"], r.get("Precision", ""))
+                if key in seen:
+                    continue
+                seen.add(key)
                 flops.append({**base, "L": r["L"], "precision": r.get("Precision", ""),
                               **{k: v for k, v in r.items() if k.startswith("Gflops_")}})
             for r in data.get("axpy", []) if isinstance(data, dict) else []:
@@ -102,7 +132,11 @@ def perfctr():
     for d in runs("*", "grid*"):
         node, exp, job = d.parts[-3:]
         m = meta(d)
-        threads = int(re.search(r"T=(\d+)", m.get("args", "T=0")).group(1))
+        t = re.search(r"(?:^|\s)T=(\d+)(?:\s|$)", m.get("args", ""))
+        if t is None:
+            print(f"SKIP {d}: no T=... in meta.txt", file=sys.stderr)
+            continue
+        threads = int(t.group(1))
         for f in d.glob("perfctr-*.csv"):
             group = f.stem.removeprefix("perfctr-")
             seen = {}

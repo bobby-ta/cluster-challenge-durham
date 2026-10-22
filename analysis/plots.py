@@ -61,7 +61,8 @@ def below(ax, ncol=2):
 def band(ax, g, x, y, color, label, ls="-"):
     s = g.groupby(x)[y].agg(["median", "min", "max"]).reset_index()
     ax.plot(s[x], s["median"], marker="o", color=color, ls=ls, label=label)
-    ax.fill_between(s[x], s["min"], s["max"], color=color, alpha=0.15, lw=0)
+    ax.fill_between(s[x].to_numpy(dtype=float), s["min"].to_numpy(dtype=float),
+                    s["max"].to_numpy(dtype=float), color=color, alpha=0.15, lw=0)
 
 
 def likwid_plots(df):
@@ -111,24 +112,63 @@ def likwid_plots(df):
             save(fig, f"likwid_bw_sizes_{node}")
 
 
+def weak_pairs(d, metric, small=24, large=32, tolerance=0.10):
+    """Match lattice sizes where L^4/threads differs by at most tolerance."""
+    summary = d.groupby(["L", "threads"])[metric].median()
+    small_t = sorted(t for l, t in summary.index if l == small)
+    large_t = sorted(t for l, t in summary.index if l == large)
+    pairs = []
+    for t1 in small_t:
+        target = small**4 / t1
+        if not large_t:
+            continue
+        t2 = min(large_t, key=lambda t: abs(large**4 / t - target))
+        mismatch = abs(large**4 / t2 - target) / target
+        if mismatch <= tolerance:
+            p1, p2 = summary[(small, t1)], summary[(large, t2)]
+            if p1 > 0:
+                pairs.append((t1, t2, (p2 / t2) / (p1 / t1), mismatch))
+    return pairs
+
+
 def grid_plots(df):
-    df = df[df.experiment == "grid"]  # untagged default runs only; tuning runs have their own TAG
+    # The challenge disables FP64. Never mix FP32 and FP64 values in one curve.
+    if "precision" in df.columns:
+        df = df[df.precision.str.upper() == "FP32"]
+    df = df[df.experiment == "grid"]  # untagged only; tuning runs have TAG
+    if df.empty:
+        print("grid plots: no default FP32 runs yet")
+        return
     metric = "Gflops_dwf4" if "Gflops_dwf4" in df else [c for c in df if c.startswith("Gflops_")][0]
     for node, d in df.groupby("node"):
         fig, (a1, a2) = plt.subplots(1, 2, figsize=(6.8, 2.4))
         for i, (L, g) in enumerate(d[d.L.isin([16, 24, 32, 48])].groupby("L")):
             band(a1, g, "threads", metric, SERIES[i], f"L={L}")
             s = g.groupby("threads")[metric].median()
-            if 1 in s.index:
-                eff = s / (s[1] * s.index)
+            if len(s):
+                baseline = min(s.index)
+                eff = s / (s[baseline] * (s.index / baseline))
                 a2.plot(eff.index, eff.values, marker="o", color=SERIES[i], label=f"L={L}")
         a1.set(xlabel="OpenMP threads", ylabel="GFLOP/s", title=f"{node}: {metric} strong scaling")
-        a2.set(xlabel="OpenMP threads", ylabel="parallel efficiency", ylim=(0, 1.1),
-               title=f"{node}: efficiency vs 1 thread")
+        a2.set(xlabel="OpenMP threads", ylabel="relative efficiency", ylim=(0, 1.1),
+               title=f"{node}: vs smallest measured thread count")
         a1.legend(); a2.legend()
         save(fig, f"grid_scaling_{node}")
 
-    # GFLOP/s vs L at full node: the weak-scaling / cache-fit story
+        # Weak scaling requires increasing the problem and threads together.
+        # L=24 at T and L=32 at approximately 3.16*T have similar sites/core.
+        pairs = weak_pairs(d, metric)
+        if pairs:
+            fig, ax = plt.subplots(figsize=ONE_COL)
+            labels = [f"{t1} to {t2}" for t1, t2, _, _ in pairs]
+            ax.bar(range(len(pairs)), [p[2] for p in pairs], color=SERIES[0], width=0.7)
+            ax.axhline(1.0, color=INK2, ls="--", lw=1)
+            ax.set(xticks=list(range(len(pairs))), xticklabels=labels,
+                   xlabel="threads: L=24 to L=32 (sites/core within 10%)",
+                   ylabel="per-core GFLOP/s ratio", title=f"{node}: approximate weak scaling")
+            save(fig, f"grid_weak_scaling_{node}")
+
+    # GFLOP/s vs L at fixed full-node threads: problem-size and cache sensitivity.
     fig, ax = plt.subplots(figsize=ONE_COL)
     for i, (node, d) in enumerate(df.groupby("node")):
         best = d[d.threads == d.threads.max()]

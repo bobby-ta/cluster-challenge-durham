@@ -48,3 +48,6 @@ and the default scaling plots stay clean.
 ```bash
 python3 analysis/collect.py && (cd analysis && python3 plots.py)
 ```
+
+Part D (Grid scaling, weak scaling, counters and roofline): see [`docs/part-d.md`](docs/part-d.md).
+Run the offline collector/plot tests with `python3 -m unittest discover -s analysis -p 'test_*.py'`.

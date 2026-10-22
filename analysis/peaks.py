@@ -15,9 +15,15 @@ NODES = {
         channels=8, mts=3200,              # TODO: confirm DIMM speed (DDR4-3200 is the max for Rome)
     ),
     "dine2": dict(
-        cpu="TODO from recon",
-        sockets=None, cores=None, ghz_base=None, ghz_boost=None,
-        dp_flops_cycle=None, sp_flops_cycle=None, channels=None, mts=None,
+        # recon 12202559: 2 sockets, 32 physical cores/socket, AVX-512.
+        # Vendor upper bounds: https://www.intel.com/content/www/us/en/products/sku/231737/
+        # intel-xeon-gold-6430-processor-60m-cache-2-10-ghz/specifications.html
+        # DDR5-4400 is the supported MAX, not verified installed DIMM speed.
+        cpu="2x Intel Xeon Gold 6430 (Sapphire Rapids, 32c)",
+        sockets=2, cores=32, ghz_base=2.1, ghz_boost=3.4,
+        dp_flops_cycle=32,             # 2x 512-bit FMA: 2 * 8 DP * 2
+        sp_flops_cycle=64,
+        channels=8, mts=4400,          # upper bound until DIMM speed is verified
     ),
 }
 
