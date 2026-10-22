@@ -160,6 +160,9 @@ is pointless (socket 0 only).
   12208088/89 dropped by runlog status). `meta.txt` `--- env` shows `GRID_CONFIG` (override works).
 
 ## 7. Decisions
+- **gc007 follow-up (authorised by Bobby, Thu ~22:30):** `recon -w gc007`; 3× `tune-clang-gc007` and 3×
+  `tune-base-gc007` (T=64, MAX_L=48, `-w gc007`); 3× `tune-clang-smt` (clang, OMP_PLACES=threads, T=128,
+  random nodes). A gc007 best case is reported **labelled as best node**, next to the random-node median.
 - **§7 cover for D queued at 22:20** (no answer about D by the 30-min mark): one repeat of D's strong
   scaling, `TAG=cover-scaling` (default MAX_L=32), split into ≤3-task arrays for the pending cap, plus
   `PERFCTR='MEM FLOPS_SP' TAG=perfctr-cover` at the same thread counts as part-d.md. **T=1 perfctr uses
