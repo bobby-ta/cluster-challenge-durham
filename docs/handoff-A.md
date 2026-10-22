@@ -223,6 +223,16 @@ is pointless (socket 0 only).
   first DINE run after the Grid install (fixed: edits are now swapped in with `mv`, and the script skips
   an installed Grid); a `pkill -f` matched its own shell. No data was affected.
 
+- **Benchmark_Grid rejects `--max-L` < 32** (`Grid : Error : --max-L must be at least 32`), so the team plan's
+  `MAX_L=24` fallback for T≤2 is **impossible**. perfctr-cover T=1 (12208332, 12208333) failed on this in 1–2 s;
+  resubmitted as one LIKWID group per job (`PERFCTR=MEM` / `PERFCTR=FLOPS_SP`), so each gets the full 55 min.
+  Cover-scaling DINE T=2 at L≤32 took 998 s, so T=1 should fit.
+- **gc007 recon 12208363 vs gc008 recon 12202855 (measured):** (1) gc007 numbers socket 0 = CPUs 0–31
+  (DINE-style), gc008 even/odd; (2) gc007 has HWP (`hwp*` cpu flags) and an active cpufreq driver (800–3400 MHz),
+  gc008 has neither. Same CPU, same 2 TB, same NUMA sizes. Hypothesis: different BIOS power profile ⇒
+  higher core/uncore clocks on gc007 ⇒ higher bandwidth and Grid throughput. **Consequence:** on DINE2,
+  `close` with T ≤ 32 is one socket on gc007 but both sockets elsewhere, so half-node results depend on the node.
+
 ## 8. For B / C / D
 - **Everyone:** `.gitignore` now keeps `results/**/*.out|*.log`; `runlog.csv` merges with `union`.
   Please `git add results/slurm` with your next results commit.
@@ -230,6 +240,11 @@ is pointless (socket 0 only).
   SMT siblings 64–127 (`likwid-topology`, recon 12202855). So `OMP_PLACES=cores OMP_PROC_BIND=close`
   with T≤32 spreads over **both** sockets on DINE2, unlike DINE (0–15 socket 0). Worth one line in §3.
   On DINE each 16 MiB L3 slice serves **2 cores** (EPYC 7302: 4 cores per CCD, 2 per CCX).
+- **D (important):** DINE2 nodes differ (gc007: contiguous core numbering + HWP/turbo control; gc008: even/odd,
+  no cpufreq driver). Check `host=` in each run's `meta.txt` before comparing DINE2 runs; half-node `close`
+  runs are one socket on gc007 and two elsewhere. `MAX_L` < 32 is rejected by Benchmark_Grid.
+- **C:** the DINE2 node variance is node-comparison material: gc007 30–75 % faster in Grid at L=24, axpy
+  340 vs 286 GB/s. Your likwid DINE2 runs: check which host they ran on.
 - **D:** `python3 -m unittest` fails on COSMA only because system python3.9 lacks matplotlib.
 - **D:** TODO Grid ready message.
 
