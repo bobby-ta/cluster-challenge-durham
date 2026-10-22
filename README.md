@@ -49,5 +49,13 @@ and the default scaling plots stay clean.
 python3 analysis/collect.py && (cd analysis && python3 plots.py)
 ```
 
+`collect.py` skips the bad job IDs listed with reasons in `EXCLUDED_JOBS`, plus runs
+whose `runlog.csv` status is not `ok`. Missing log entries alone do not reject older runs.
+Exclusions cover whole jobs, including any usable single-core rows; raw results stay intact.
+Only DINE jobs 12200761–12200763 retain the existing even-thread, compact AVX compute
+reuse at half the recorded thread count. DINE2 requires fixed `flops`/`bw` runs.
+Rooflines use the same compute selection and fixed bandwidth runs. Figures with no
+valid source data are removed when plotting, so old charts cannot survive an exclusion.
+
 Part D (Grid scaling, weak scaling, counters and roofline): see [`docs/part-d.md`](docs/part-d.md).
 Run the offline collector/plot tests with `python3 -m unittest discover -s analysis -p 'test_*.py'`.

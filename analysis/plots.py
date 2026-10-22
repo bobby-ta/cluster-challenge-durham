@@ -12,7 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from peaks import peaks
+from peaks import NODES, peaks
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "analysis" / "data"
@@ -35,9 +35,15 @@ def save(fig, name):
     FIGS.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()
     for ext in ("pdf", "png"):
-        fig.savefig(FIGS / f"{name}.{ext}")
+        fig.savefig(FIGS / f"{name}.{ext}", bbox_inches="tight")
     plt.close(fig)
     print("wrote", name)
+
+
+def discard(name):
+    """Remove generated figures whose valid source measurements are now absent."""
+    for ext in ("pdf", "png"):
+        (FIGS / f"{name}.{ext}").unlink(missing_ok=True)
 
 
 def load(name):
@@ -65,42 +71,55 @@ def band(ax, g, x, y, color, label, ls="-"):
                     s["max"].to_numpy(dtype=float), color=color, alpha=0.15, lw=0)
 
 
+def flops_rows(d):
+    """Fixed compute runs plus the specifically validated legacy DINE AVX runs."""
+    compute = d.kernel.str.startswith("peakflops", na=False)
+    # DINE's even compact AVX rows matched the fixed run after converting SMT
+    # threads to physical cores. This comparison does not establish reuse on DINE2.
+    old = d[(d.node == "dine") & d.job.astype(str).isin(["12200761", "12200762", "12200763"])
+            & (d["mode"] == "threads") & compute & d.kernel.str.contains("avx", na=False)
+            & (d.placement == "compact") & (d.threads % 2 == 0)].assign(threads=lambda x: x.threads // 2)
+    fixed = d[(d["mode"] == "flops") & compute & (d.placement == "compact")]
+    return pd.concat([old, fixed]).assign(GFlops=lambda x: x.MFlops / 1e3)
+
+
 def likwid_plots(df):
-    for node, d in df.groupby("node"):
+    for node in sorted(set(NODES) | set(df.node)):
+        d = df[df.node == node]
         pk = peaks(node)
-        # Mode "threads" (jobs 12200761-3) pinned 2 threads per core, so it is left out.
         # Bandwidth vs cores
-        fig, ax = plt.subplots(figsize=ONE_COL)
         bw = d[d["mode"] == "bw"]
-        for i, k in enumerate(k for k in ["load_avx", "copy_avx", "triad_avx", "triad_mem_avx",
-                                          "stream_avx", "copy_mem_avx", "stream_mem_avx"]
-                              if k in set(bw.kernel)):
-            for pl, ls in [("compact", "-"), ("scatter", ":")]:
-                g = bw[(bw.kernel == k) & (bw.placement == pl)].assign(GBps=lambda x: x.MBps / 1e3)
-                if len(g):
-                    band(ax, g, "threads", "GBps", SERIES[i], f"{k} ({pl})", ls)
-        if pk:
-            ref_line(ax, pk["gbs"], f"theoretical {pk['gbs']:.0f} GB/s")
-        ax.set(xlabel="cores (1 thread each)", ylabel="GB/s", title=f"{node}: memory bandwidth vs cores")
-        below(ax)
-        save(fig, f"likwid_bw_threads_{node}")
+        if len(bw):
+            fig, ax = plt.subplots(figsize=ONE_COL)
+            for i, k in enumerate(k for k in ["load_avx", "copy_avx", "triad_avx", "triad_mem_avx",
+                                              "stream_avx", "copy_mem_avx", "stream_mem_avx"]
+                                  if k in set(bw.kernel)):
+                for pl, ls in [("compact", "-"), ("scatter", ":")]:
+                    g = bw[(bw.kernel == k) & (bw.placement == pl)].assign(GBps=lambda x: x.MBps / 1e3)
+                    if len(g):
+                        band(ax, g, "threads", "GBps", SERIES[i], f"{k} ({pl})", ls)
+            if pk:
+                ref_line(ax, pk["gbs"], f"theoretical {pk['gbs']:.0f} GB/s")
+            ax.set(xlabel="cores (1 thread each)", ylabel="GB/s", title=f"{node}: memory bandwidth vs cores")
+            below(ax)
+            save(fig, f"likwid_bw_threads_{node}")
+        else:
+            discard(f"likwid_bw_threads_{node}")
 
         # Flops vs threads
-        fig, ax = plt.subplots(figsize=ONE_COL)
-        # Old "threads" jobs: even thread counts = t/2 cores with 2 SMT threads each. For the AVX
-        # kernels that matches 1 thread/core (838 GF at 16 cores both ways); scalar/SSE gain from
-        # SMT, so only reuse AVX. Odd counts mix 1 and 2 threads/core, so drop them.
-        old = d[(d["mode"] == "threads") & d.kernel.str.contains("avx")
-                & (d.placement == "compact") & (d.threads % 2 == 0)].assign(threads=lambda x: x.threads // 2)
-        fl = pd.concat([old, d[d["mode"] == "flops"]]).assign(GFlops=lambda x: x.MFlops / 1e3)
-        for i, (k, g) in enumerate(fl[fl.placement == "compact"].groupby("kernel")):
-            band(ax, g, "threads", "GFlops", SERIES[i % len(SERIES)], k)
-        if pk:
-            ref_line(ax, pk["gflops_sp"], "SP peak (base clock)")
-            ref_line(ax, pk["gflops_dp"], "DP peak (base clock)")
-        ax.set(xlabel="cores (1 thread each)", ylabel="GFLOP/s", title=f"{node}: compute vs cores")
-        below(ax)
-        save(fig, f"likwid_flops_threads_{node}")
+        fl = flops_rows(d)
+        if len(fl):
+            fig, ax = plt.subplots(figsize=ONE_COL)
+            for i, (k, g) in enumerate(fl.groupby("kernel")):
+                band(ax, g, "threads", "GFlops", SERIES[i % len(SERIES)], k)
+            if pk:
+                ref_line(ax, pk["gflops_sp"], "SP peak (base clock)")
+                ref_line(ax, pk["gflops_dp"], "DP peak (base clock)")
+            ax.set(xlabel="cores (1 thread each)", ylabel="GFLOP/s", title=f"{node}: compute vs cores")
+            below(ax)
+            save(fig, f"likwid_flops_threads_{node}")
+        else:
+            discard(f"likwid_flops_threads_{node}")
 
         # Bandwidth vs working set
         s = d[d["mode"] == "sizes"].copy()
@@ -116,6 +135,8 @@ def likwid_plots(df):
                        ylabel="GB/s", title=f"{node}: {'1 thread' if pl == 'single' else 'all cores'}")
             axes[0].legend()
             save(fig, f"likwid_bw_sizes_{node}")
+        else:
+            discard(f"likwid_bw_sizes_{node}")
 
 
 def weak_pairs(d, metric, small=24, large=32, tolerance=0.10):
@@ -187,12 +208,15 @@ def grid_plots(df):
 def roofline(lk, perf):
     """Ceilings from likwid-bench measurements, Grid's points from likwid-perfctr."""
     import numpy as np
-    for node, d in lk.groupby("node"):
-        t = d[d["mode"] == "threads"]
-        sp = t[t.kernel.str.contains("peakflops_sp")].MFlops.max() / 1e3
-        dp = t[t.kernel.str.match(r"peakflops(_avx.*)?$")].MFlops.max() / 1e3
-        mem = t[t.kernel.str.contains("triad|stream")].MBps.max() / 1e3
+    for node in sorted(set(NODES) | set(lk.node)):
+        d = lk[lk.node == node]
+        fl = flops_rows(d)
+        sp = fl[fl.kernel.str.startswith("peakflops_sp", na=False)].MFlops.max() / 1e3
+        dp = fl[~fl.kernel.str.startswith("peakflops_sp", na=False)].MFlops.max() / 1e3
+        bw = d[(d["mode"] == "bw") & d.kernel.str.contains("triad|stream", na=False)]
+        mem = bw.MBps.max() / 1e3
         if any(pd.isna([sp, mem])):
+            discard(f"roofline_{node}")
             continue
         fig, ax = plt.subplots(figsize=ONE_COL)
         ai = np.logspace(-2, 2, 200)
@@ -217,9 +241,10 @@ def roofline(lk, perf):
 
 if __name__ == "__main__":
     lk, gr, pf = load("likwid.csv"), load("grid.csv"), load("perfctr.csv")
-    if lk is not None:
-        likwid_plots(lk)
+    if lk is None:
+        lk = pd.DataFrame(columns=["node", "mode", "job", "kernel", "placement",
+                                   "threads", "MBps", "MFlops"])
+    likwid_plots(lk)
     if gr is not None:
         grid_plots(gr)
-    if lk is not None:
-        roofline(lk, pf)
+    roofline(lk, pf)

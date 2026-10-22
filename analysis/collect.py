@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gather every run under results/ into tidy CSVs in analysis/data/.
+"""Gather usable runs under results/ into tidy CSVs in analysis/data/.
 
     python3 analysis/collect.py [results_dir]
 
@@ -13,6 +13,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "results"
 OUT = ROOT / "analysis" / "data"
+
+# Exclude whole jobs, including their usable single-core rows, to keep reruns separate.
+# See issue #2. The old DINE compute jobs are retained only for plots.py's validated reuse.
+EXCLUDED_JOBS = {
+    "12200764": "DINE sizes: all-core rows used 32 SMT threads on 16 physical cores",
+    "12203200": "DINE2 compute: SMT pinning; DINE's AVX reuse was not validated here",
+    "12203201": "DINE2 bandwidth: SMT pinning, full node was not measured",
+    "12203202": "DINE2 sizes: all-core rows used 64 SMT threads on 32 physical cores (socket 0)",
+}
 
 
 def meta(run_dir):
@@ -28,7 +37,24 @@ def meta(run_dir):
 
 def runs(node_glob, exp_glob):
     # results/<node>/<experiment>/<job>/
-    return sorted(RESULTS.glob(f"{node_glob}/{exp_glob}/*/"))
+    logged = {}
+    runlog = RESULTS / "runlog.csv"
+    if runlog.exists():
+        with runlog.open(newline="") as f:
+            for row in csv.DictReader(f):
+                logged[(row["node"], row["experiment"], row["job"])] = row
+    for d in sorted(RESULTS.glob(f"{node_glob}/{exp_glob}/*/")):
+        node, exp, job = d.parts[-3:]
+        reason = EXCLUDED_JOBS.get(job.split("_", 1)[0])
+        record = logged.get((node, exp, job))
+        if not reason and record and record["status"].strip().lower() != "ok":
+            reason = f"runlog status={record['status']}: {record.get('note', '')}"
+        if reason:
+            print(f"SKIP {d}: {reason}", file=sys.stderr)
+            continue
+        # Older completed measurements may have no runlog entry. Explicit exclusions
+        # above cover known bad jobs; absence from the log alone is not a failure.
+        yield d
 
 
 def write(name, rows):
@@ -53,8 +79,9 @@ def likwid():
         f = d / "out.csv"
         if not f.exists():
             continue
-        for r in csv.DictReader(open(f)):
-            rows.append({"node": node, "mode": exp.removeprefix("likwid-"), "job": job, **r})
+        with f.open(newline="") as source:
+            for r in csv.DictReader(source):
+                rows.append({"node": node, "mode": exp.removeprefix("likwid-"), "job": job, **r})
     write("likwid.csv", rows)
 
 
