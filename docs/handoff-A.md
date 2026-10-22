@@ -233,6 +233,16 @@ is pointless (socket 0 only).
   higher core/uncore clocks on gc007 ⇒ higher bandwidth and Grid throughput. **Consequence:** on DINE2,
   `close` with T ≤ 32 is one socket on gc007 but both sockets elsewhere, so half-node results depend on the node.
 
+- **perfctr with T>1 hangs on DINE (measured, D's `grid.sbatch` path):** 12208335 (T=8/16/32, `-C N:0-(T-1)`)
+  hit the 1650 s per-group timeout; every axpy call costs ~12 ms regardless of size (0.06 GB/s at L=8,
+  vs ~10 µs normally) = OpenMP threads time-sliced on too few hardware threads. Likely cause (hypothesis):
+  likwid's pin library pins threads in creation order, and Open MPI 5 starts helper threads before the
+  OpenMP team, so Grid threads double up. T=1 runs are unaffected (12208409/10, 12208416/27 run at normal
+  speed). Cancelled 12208335 (mine) during its second group; dropped the DINE2 T>1 perfctr set.
+  **Suggested fix for D (untested):** count without pinning and let OpenMP pin: `likwid-perfctr -c N:0-$((T-1))`
+  instead of `-C`, keeping `OMP_PROC_BIND=close OMP_PLACES=cores`; or `-C ... -s <skipmask>` to skip the MPI
+  threads. Test one T=8 job before a campaign.
+
 ## 8. For B / C / D
 - **Everyone:** `.gitignore` now keeps `results/**/*.out|*.log`; `runlog.csv` merges with `union`.
   Please `git add results/slurm` with your next results commit.
