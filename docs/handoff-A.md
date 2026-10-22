@@ -106,21 +106,22 @@ PERFCTR='MEM FLOPS_SP' TAG=perfctr-cover scripts/submit.sh dine2 grid --array=8,
 TAG=cover-scaling scripts/submit.sh dine2 grid --array=64
 ```
 
-## 5. Best case so far (Thu 22:25, full sweep, `python3 analysis/tuning.py`)
+## 5. Best case (final for Thursday night, 23:50; `python3 analysis/tuning.py`)
 Headline is over the brief's sizes L ≥ 24 (median of 3 separate jobs, dwf4, GFLOP/s SP):
 
 | node | best median | config | L | T | jobs | % SP peak (base / turbo) |
 |---|---|---|---|---|---|---|
-| DINE | **361.4** (350.1–362.7) | gcc `cpu-avx2`, close/cores, first-touch | 48 | 32 | 12208201_32 12208221_32 12208264_32 | 11.8 % / 10.7 % of 3072 / 3379 |
-| DINE2 | **740.4** (738.5–742.6) | clang `cpu-avx512-clang`, close/cores, first-touch | 24 | 64 | 12208210_64 12208244_64 12208285_64 | 8.6 % / 5.3 % of 8602 / 13926 |
+| DINE | **361.4** (350.1–362.7) | gcc `cpu-avx2`, `close`, `OMP_PLACES=cores`, first-touch | 48 | 32 | 12208201_32 12208221_32 12208264_32 | 11.8 % / 10.7 % of 3072 / 3379 |
+| DINE2 | **827.5** (824.4–833.4) | clang `cpu-avx512-clang`, `close`, `OMP_PLACES='{0,64}:32:2,{1,65}:32:2'` (socket-ordered SMT pairs), first-touch, `-x gc007` | 24 | 128 | 12208577_128 12208589_128 12208600_128 | 9.6 % / 5.9 % of 8602 / 13926 |
 
-Single best runs, labelled as maxima: DINE 368.7 (tune-base T=32 L=32); DINE2 878.1 (tune-smt T=128
-L=24, node **gc007**). Cache-resident L < 24 (separate, not headline): DINE 848.3 (clang L=16), DINE2 2677.4 (clang L=12).
+Single best runs, labelled as maxima: DINE 368.7 (tune-base T=32 L=32); DINE2 878.1 (gcc tune-smt T=128 L=24 on
+gc007, whose numbering is already socket-contiguous). Cache-resident L < 24 (not headline): DINE 848.3 (clang L=16),
+DINE2 2691.8 median / 2829.9 max (clang socket-ordered, L=12).
 
 Reproduce:
 ```bash
 TAG=tune-base MAX_L=48 scripts/submit.sh dine grid --array=32
-TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-clang-smt-sockorder GRID_CONFIG=cpu-avx512-clang OMP_PLACES='{0,64}:32:2,{1,65}:32:2' MAX_L=48 scripts/submit.sh dine2 grid -x gc007 --array=128
 ```
 
 **Knobs (L=32 unless stated; hypotheses unless marked measured):**
@@ -143,8 +144,12 @@ TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 gri
   gc001/3/4/5/6/8 (base 799 vs ~500; smt 878 vs ~532; interleave 658 vs ~482). Grid axpy at L=48: gc007 340 GB/s
   vs gc003 286 GB/s. Hypothesis: different DIMM population/speed on gc007 (recon was on gc008). DINE nodes agree within 4 %.
 
-**Untested combinations (Friday morning candidates):** DINE2 clang + SMT (T=128); clang on gc007; clang + spread at T=32
-is pointless (socket 0 only).
+- *SMT on DINE2*: +3–10 % on top of good placement (clang 748→828 at L=24 socket-ordered); latency hiding helps
+  once cross-socket traffic is gone. On DINE SMT loses 30 %.
+
+**Untested combinations (Friday morning candidates):** gcc + SMT + socket-ordered pairs on even/odd DINE2 nodes
+(gcc SMT on gc007 gave the single max 878); half node (T=32) socket-ordered on DINE2 to separate "one socket"
+from "alternating" placement.
 
 ## 6. Smoke timing (Thu 21:46; jobs 12208156–12208159, all exit 0, `TAG=smoke`)
 | node | T | MAX_L | wall (runlog) | dwf4 L=24 | L=32 | L=48 GFLOP/s SP |
@@ -275,5 +280,17 @@ is pointless (socket 0 only).
 - **D:** `python3 -m unittest` fails on COSMA only because system python3.9 lacks matplotlib.
 - **D:** TODO Grid ready message.
 
-## 9. Friday morning plan
-TODO.
+## 9. Friday morning plan (submit everything by 12:00; queues close 16:00)
+1. Bobby: push A's commits (top of this file); send D/C the messages below; get usernames → A fills
+   `config/team.env` (`config: team name and users`) and runs the `setfacl` grants (§3.3) **while no job is queued**.
+2. Optional DINE2 tuning (3 repeats each, ≤6 pending):
+   ```bash
+   cd ~/ccd
+   for r in 1 2 3; do
+     TAG=tune-smt-sockorder OMP_PLACES='{0,64}:32:2,{1,65}:32:2' MAX_L=48 scripts/submit.sh dine2 grid -x gc007 --array=128
+     TAG=tune-sockorder-half OMP_PLACES='{0}:32:2,{1}:32:2' MAX_L=48 scripts/submit.sh dine2 grid -x gc007 --array=32
+   done
+   ```
+3. If D wants counters at T>1: fix the perfctr pinning in `grid.sbatch` first (see Decisions), test one T=8 job.
+4. Re-run `python3 analysis/job_count.py` after the last job; update report §1 experiment count.
+5. Recons 12208435 (gc002) and 12208537 (gc006) were still pending at 23:50: collect + commit.
