@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "analysis" / "data"
 METRICS = ("Gflops_dwf4", "Gflops_wilson")
 MIN_REPEATS = 3
+# The brief's lattice sizes are 24, 32 and 48; L <= 16 fits in cache (DINE2: 2x60 MiB L3) and is
+# reported separately as a cache-resident best, not as the headline number.
+HEADLINE_MIN_L = 24
 
 
 def load():
@@ -72,18 +75,23 @@ def report(rows):
               f"{r[key]:>9.1f} {r['Gflops_dwf4_min']:>8.1f} {r['Gflops_dwf4_max']:>8.1f} "
               f"{r['Gflops_wilson_median'] or float('nan'):>10.1f}")
     for node in sorted({r["node"] for r in rows}):
-        mine = [r for r in rows if r["node"] == node]
-        ok = [r for r in mine if r["n"] >= MIN_REPEATS]
-        if ok:
-            b = max(ok, key=lambda r: r[key])
-            print(f"\nBEST {node} (median of n={b['n']}): {b[key]:.1f} GFLOP/s dwf4 SP, "
-                  f"{b['tag']} T={b['threads']} L={b['L']} config={b['config']} "
-                  f"bind={b['bind']} numactl={b['numactl'] or '-'} jobs={b['jobs']}")
-        else:
-            print(f"\nBEST {node}: no setting has {MIN_REPEATS} repeats yet")
-        m = max(mine, key=lambda r: r["Gflops_dwf4_max"])
-        print(f"MAX  {node} (single run): {m['Gflops_dwf4_max']:.1f} GFLOP/s dwf4 SP, "
-              f"{m['tag']} T={m['threads']} L={m['L']}")
+        print()
+        for label, keep in ((f"L>={HEADLINE_MIN_L}", lambda r: r["L"] >= HEADLINE_MIN_L),
+                            ("cache-resident L<24", lambda r: r["L"] < HEADLINE_MIN_L)):
+            mine = [r for r in rows if r["node"] == node and keep(r)]
+            if not mine:
+                continue
+            ok = [r for r in mine if r["n"] >= MIN_REPEATS]
+            if ok:
+                b = max(ok, key=lambda r: r[key])
+                print(f"BEST {node} {label} (median of n={b['n']}): {b[key]:.1f} GFLOP/s dwf4 SP, "
+                      f"{b['tag']} T={b['threads']} L={b['L']} config={b['config']} "
+                      f"bind={b['bind']} numactl={b['numactl'] or '-'} jobs={b['jobs']}")
+            else:
+                print(f"BEST {node} {label}: no setting has {MIN_REPEATS} repeats yet")
+            m = max(mine, key=lambda r: r["Gflops_dwf4_max"])
+            print(f"MAX  {node} {label} (single run): {m['Gflops_dwf4_max']:.1f} GFLOP/s dwf4 SP, "
+                  f"{m['tag']} T={m['threads']} L={m['L']}")
 
 
 if __name__ == "__main__":
