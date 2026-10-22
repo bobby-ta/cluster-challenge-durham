@@ -67,31 +67,37 @@ def band(ax, g, x, y, color, label, ls="-"):
 def likwid_plots(df):
     for node, d in df.groupby("node"):
         pk = peaks(node)
-        t = d[d["mode"] == "threads"]
-        # Bandwidth vs threads
+        # Mode "threads" (jobs 12200761-3) pinned 2 threads per core, so it is left out.
+        # Bandwidth vs cores
         fig, ax = plt.subplots(figsize=ONE_COL)
-        bw = t[~t.kernel.str.startswith("peakflops")]
-        for i, k in enumerate(k for k in ["load_avx", "copy_avx", "stream_avx", "triad_avx",
-                                          "copy_mem_avx", "stream_mem_avx"] if k in set(bw.kernel)):
+        bw = d[d["mode"] == "bw"]
+        for i, k in enumerate(k for k in ["load_avx", "copy_avx", "triad_avx", "triad_mem_avx",
+                                          "stream_avx", "copy_mem_avx", "stream_mem_avx"]
+                              if k in set(bw.kernel)):
             for pl, ls in [("compact", "-"), ("scatter", ":")]:
                 g = bw[(bw.kernel == k) & (bw.placement == pl)].assign(GBps=lambda x: x.MBps / 1e3)
                 if len(g):
                     band(ax, g, "threads", "GBps", SERIES[i], f"{k} ({pl})", ls)
         if pk:
             ref_line(ax, pk["gbs"], f"theoretical {pk['gbs']:.0f} GB/s")
-        ax.set(xlabel="threads", ylabel="GB/s", title=f"{node}: memory bandwidth vs threads")
+        ax.set(xlabel="cores (1 thread each)", ylabel="GB/s", title=f"{node}: memory bandwidth vs cores")
         below(ax)
         save(fig, f"likwid_bw_threads_{node}")
 
         # Flops vs threads
         fig, ax = plt.subplots(figsize=ONE_COL)
-        fl = t[t.kernel.str.startswith("peakflops")].assign(GFlops=lambda x: x.MFlops / 1e3)
+        # Old "threads" jobs: even thread counts = t/2 cores with 2 SMT threads each. For the AVX
+        # kernels that matches 1 thread/core (838 GF at 16 cores both ways); scalar/SSE gain from
+        # SMT, so only reuse AVX. Odd counts mix 1 and 2 threads/core, so drop them.
+        old = d[(d["mode"] == "threads") & d.kernel.str.contains("avx")
+                & (d.placement == "compact") & (d.threads % 2 == 0)].assign(threads=lambda x: x.threads // 2)
+        fl = pd.concat([old, d[d["mode"] == "flops"]]).assign(GFlops=lambda x: x.MFlops / 1e3)
         for i, (k, g) in enumerate(fl[fl.placement == "compact"].groupby("kernel")):
             band(ax, g, "threads", "GFlops", SERIES[i % len(SERIES)], k)
         if pk:
             ref_line(ax, pk["gflops_sp"], "SP peak (base clock)")
             ref_line(ax, pk["gflops_dp"], "DP peak (base clock)")
-        ax.set(xlabel="threads", ylabel="GFLOP/s", title=f"{node}: compute vs threads")
+        ax.set(xlabel="cores (1 thread each)", ylabel="GFLOP/s", title=f"{node}: compute vs cores")
         below(ax)
         save(fig, f"likwid_flops_threads_{node}")
 

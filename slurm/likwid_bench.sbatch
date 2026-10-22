@@ -3,28 +3,34 @@
 #SBATCH -A do022
 #SBATCH -N 1
 #SBATCH --exclusive
-#SBATCH -t 00:55:00
-# likwid-bench sweeps. One job = one mode, all kernels, all thread counts, so it fits in < 1 h.
+#SBATCH -t 00:30:00
+# likwid-bench sweeps. One job = one mode (and, for bw, ideally one kernel), so each job is short.
 # Usage (via scripts/submit.sh): likwid_bench.sbatch <mode>
-#   threads : bandwidth and flops vs thread count, compact and scatter placement
-#   sizes   : bandwidth vs working-set size (L1 -> DRAM), 1 thread and all cores
-# Override kernels with KERNELS="triad_avx ..." and thread list with THREADS="1 2 4 ...".
+#   flops   : FLOP/s vs cores, all scalar/SSE/AVX peakflops kernels, data in L1   (~20 min)
+#   bw      : DRAM bandwidth vs cores, compact and scatter, 2 GB total           (~12 min per kernel)
+#   sizes   : bandwidth vs working-set size (L1 -> DRAM), 1 core and all cores
+# Override kernels with KERNELS="triad_avx ..." and the core list with THREADS="1 2 4 ...".
+# Measured cost per likwid-bench call on DINE: ~6 s (peakflops), ~15 s (2 GB bandwidth).
+#
+# Pinning: always one thread per physical core. likwid's domains list SMT siblings next to each
+# other (DINE: N = 0,32,1,33,...), so -W <dom>:<size>:<t>:1:<SMT> takes every SMT-th entry.
+# Without the stride, "32 threads" was really 16 cores x 2 hyperthreads (jobs 12200761-64).
 EXPERIMENT=likwid-${1:?mode}
 source "$REPO/slurm/common.sh"
 record_meta "$@"
 cd "$RUN_DIR"
 
 available=$(likwid-bench -a | awk '{print $1}' | tr -d ':')
-pick() { for k in "$@"; do grep -qx "$k" <<<"$available" && echo "$k"; done; true; }
+grep -qw avx512f /proc/cpuinfo && HAS512=1 || HAS512=0
+# Keep kernels that exist and that this CPU can execute (AVX-512 ones SIGILL on Zen 2).
+pick() { for k in "$@"; do
+  [[ $k == *avx512* && $HAS512 == 0 ]] && continue
+  grep -qx "$k" <<<"$available" && echo "$k"; done; true; }
 
-FLOP_KERNELS=$(pick peakflops peakflops_sse peakflops_avx peakflops_avx_fma peakflops_avx512 peakflops_avx512_fma \
-                    peakflops_sp peakflops_sp_avx peakflops_sp_avx_fma peakflops_sp_avx512 peakflops_sp_avx512_fma)
-BW_KERNELS=$(pick load_avx copy_avx copy_mem_avx store_avx store_mem_avx stream_avx stream_mem_avx \
-                  triad_avx triad_mem_avx daxpy_avx load_avx512 copy_avx512 stream_avx512 triad_avx512)
-KERNELS=${KERNELS:-"$FLOP_KERNELS $BW_KERNELS"}
+SMT=$(lscpu | awk -F: '/Thread\(s\) per core/{gsub(/ /,"",$2); print $2}'); SMT=${SMT:-1}
 NUMA=$(likwid-topology | awk '/NUMA domains:/{print $3}')
-THREADS=${THREADS:-"$(seq -s ' ' 1 1 4) 6 8 12 16 20 24 28 32 48 64 96 128"}
 REPEATS=${REPEATS:-3}
+echo "SMT=$SMT NUMA=$NUMA NCORES=$NCORES HAS512=$HAS512" >> meta.txt
 
 # One run; appends "kernel,placement,threads,size,rep,MByte/s,MFlops/s" to out.csv
 run() {  # run <kernel> <placement> <threads> <size-per-thread> <workgroup args...>
@@ -40,35 +46,44 @@ run() {  # run <kernel> <placement> <threads> <size-per-thread> <workgroup args.
 mkdir -p raw
 echo "kernel,placement,threads,size,rep,MBps,MFlops" > out.csv
 
+# compact: fill cores in order (socket 0 first). scatter: same number of cores on every NUMA domain.
+compact() { run "$1" compact "$2" "$3" -W "N:$3:$2:1:$SMT"; }
+scatter() {  # scatter <kernel> <threads> <total size> <size per domain>
+  (( NUMA > 1 && $2 >= NUMA && $2 % NUMA == 0 )) || return 0
+  local args=(); for ((m=0; m<NUMA; m++)); do args+=(-W "M$m:$4:$(($2/NUMA)):1:$SMT"); done
+  run "$1" scatter "$2" "$3" "${args[@]}"
+}
+
 case "$1" in
-threads)
-  for k in $KERNELS; do
-    # Flop kernels: keep data in L1 (16 kB/thread). Bandwidth kernels: 2 GB total, far beyond L3.
-    if [[ $k == peakflops* ]]; then per=16; else per=0; fi
-    for t in $THREADS; do
+flops)
+  # Placement doesn't matter for in-L1 compute, so compact only. 16 kB per core stays in L1.
+  for k in ${KERNELS:-$(pick peakflops peakflops_sse peakflops_avx peakflops_avx_fma peakflops_amd_zen_avx_fma_add \
+                             peakflops_sp peakflops_sp_avx peakflops_sp_avx_fma)}; do
+    for t in ${THREADS:-1 2 4 8 16 24 32}; do
       (( t > NCORES )) && continue
-      if [[ $per != 0 ]]; then size="$((per*t))kB"; else size=2GB; fi
-      # compact: likwid fills the node domain core by core
-      run "$k" compact "$t" "$size" -W "N:$size:$t"
-      # scatter: spread evenly over NUMA domains (only when it divides)
-      if (( NUMA > 1 && t >= NUMA && t % NUMA == 0 )); then
-        if [[ $per != 0 ]]; then dsize="$((per*t/NUMA))kB"; else dsize="$((2048/NUMA))MB"; fi
-        args=(); for ((m=0; m<NUMA; m++)); do args+=(-W "M$m:$dsize:$((t/NUMA))"); done
-        run "$k" scatter "$t" "$size" "${args[@]}"
-      fi
+      compact "$k" "$t" "$((16*t))kB"
+    done
+  done ;;
+bw)
+  # 2 GB total, far beyond the 256 MB of L3, so this is DRAM bandwidth.
+  for k in ${KERNELS:-$(pick load_avx copy_avx triad_avx triad_mem_avx)}; do
+    for t in ${THREADS:-1 2 4 6 8 12 16 24 32}; do
+      (( t > NCORES )) && continue
+      compact "$k" "$t" 2GB
+      scatter "$k" "$t" 2GB "$((2048/NUMA))MB"
     done
   done ;;
 sizes)
   SIZES=${SIZES:-"8kB 16kB 24kB 32kB 64kB 128kB 256kB 512kB 1MB 2MB 4MB 8MB 16MB 32MB 64MB 128MB 256MB 512MB 1GB 2GB"}
-  for k in ${KERNELS_SIZES:-$(pick load_avx copy_avx triad_avx stream_avx)}; do
+  for k in ${KERNELS:-$(pick load_avx copy_avx triad_avx)}; do
     for s in $SIZES; do
       run "$k" single 1 "$s" -W "N:$s:1"
       # all cores: size is per thread, so scale the total
       num=${s%[kMG]B}; u=${s#$num}
-      run "$k" all "$NCORES" "$s" -W "N:$((num*NCORES))$u:$NCORES"
+      run "$k" all "$NCORES" "$s" -W "N:$((num*NCORES))$u:$NCORES:1:$SMT"
     done
   done ;;
-*) echo "unknown mode $1"; exit 1 ;;
+*) echo "unknown mode $1 (flops|bw|sizes)"; exit 1 ;;
 esac
 
-log_run ok "$(wc -l < out.csv) rows"
+log_run ok "$(($(wc -l < out.csv) - 1)) rows"
