@@ -93,7 +93,18 @@ Format: `time jobid command`. Collect with:
 22:20 12208324 TAG=cover-scaling scripts/submit.sh dine grid --array=8,12,16
 22:20 12208325 TAG=cover-scaling scripts/submit.sh dine2 grid --array=8,12,16
 ```
-Cancelled (no-op `--dslash-*` flag): 12208220, 12208232, 12208245, 12208268.
+Cancelled (no-op `--dslash-*` flag): 12208220, 12208232, 12208245, 12208268. Cancelled (perfctr hang): 12208335.
+Later submissions (full list: `sacct -u dc-ta1 -S 2026-10-22 -X -o JobID,JobName,State`): gc007 follow-up
+12208364/67/96/99/407/08, clang-smt 12208386/401/14, recons 12208363, 12208434/35/41/81, 12208506/37,
+sockorder 12208553–12208600, perfctr-cover T=1 12208409/10/16/27.
+**Queued Fri 00:55 (optional DINE2 runs, Bobby's OK):** 12208909/11/13 `tune-smt-sockorder` (gcc, T=128,
+`OMP_PLACES='{0,64}:32:2,{1,65}:32:2'`), 12208910/12/14 `tune-sockorder-half` (gcc, T=32, `'{0}:32:2,{1}:32:2'`),
+all `-x gc007`, MAX_L=48. When `squeue --me` is empty:
+```bash
+cd ~/ccd && git add results && git commit -m "results: dine2 smt-sockorder + sockorder-half" \
+  && python3 analysis/collect.py && python3 analysis/tuning.py && python3 analysis/job_count.py \
+  && git add analysis/data && git commit -m "analysis: final tuning summary and job count"
+```
 
 ## 4. Still to submit before Fri 12:00
 Tuning sweep: all submitted (Thu 22:13). Cover runs are topped up automatically while this session lives;
@@ -289,7 +300,7 @@ from "alternating" placement.
 ## 9. Friday morning plan (submit everything by 12:00; queues close 16:00)
 1. Bobby: push A's commits (top of this file); send D/C the messages below; get usernames → A fills
    `config/team.env` (`config: team name and users`) and runs the `setfacl` grants (§3.3) **while no job is queued**.
-2. Optional DINE2 tuning (3 repeats each, ≤6 pending):
+2. **Already queued Fri 00:55** (12208909–14, see §3): only collect them. These were the commands:
    ```bash
    cd ~/ccd
    for r in 1 2 3; do
