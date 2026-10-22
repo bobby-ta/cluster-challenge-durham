@@ -48,8 +48,21 @@ TODO after smoke.
 ## 5. Best case so far
 TODO (no Grid data).
 
-## 6. Smoke timing
-TODO.
+## 6. Smoke timing (Thu 21:46; jobs 12208156–12208159, all exit 0, `TAG=smoke`)
+| node | T | MAX_L | wall (runlog) | dwf4 L=24 | L=32 | L=48 GFLOP/s SP |
+|---|---|---|---|---|---|---|
+| dine | 8 | 32 | 357 s | 126.6 | 117.5 | – |
+| dine | 32 | 48 | 480 s | 334.6 | 345.2 | 348.8 |
+| dine2 | 8 | 32 | 185 s | 223.9 | 216.5 | – |
+| dine2 | 64 | 48 | 338 s | 505.1 | 645.7 | 437.2 |
+
+- (a) Full node: L≤32 is under ~6 min (DINE) / ~4 min (DINE2) (estimate, not measured), and L≤48 takes 8 min / 5.6 min (measured).
+- (b) 1 thread, L≤32: the upper bound is 8 × T=8 time (true only if 1→8 scaled perfectly; it scales worse because it's memory-bound, so
+  the real time is lower): **DINE ≤ ~48 min, DINE2 ≤ ~25 min**. Both are under the 55-min `timeout`, so **no `MAX_L=24`
+  fallback is needed**. DINE T=1 is the tightest; if it times out, rerun T≤2 with `MAX_L=24`.
+- Tuning uses **`MAX_L=48`** (full-node L≤48 run < 30 min).
+- `collect.py` parses the runs fine (columns `Gflops_dwf4`, `Gflops_wilson`, `Gflops_staggered`; failed
+  12208088/89 dropped by runlog status). `meta.txt` `--- env` shows `GRID_CONFIG` (override works).
 
 ## 7. Decisions
 - **RULE (after three self-inflicted breakages): never edit `build/`, `slurm/`, `config/` or `scripts/`
