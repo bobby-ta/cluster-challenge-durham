@@ -62,9 +62,17 @@ socket\,0 cores even and socket\,1 odd, so \texttt{close} with $T\le32$ still sp
 % Fig: grid_scaling_<node>, grid_vs_L. Strong scaling, where it flattens and why; best-case throughput + config.
 
 % A: best-case — D may move into §3
-\paragraph{Best case.} TODO(A): Table of the highest median \texttt{Gflops\_dwf4} (SP, $\ge$3 repeats)
-per node with $L$, threads, build, binding, NUMA policy and Grid flags, and its fraction of the SP
-peak in Table~\ref{tab:hw}; source \texttt{analysis/data/tuning\_summary.csv}.
+\paragraph{Best case.} Highest median \texttt{Gflops\_dwf4} (SP) over 3 separate jobs, $L\ge24$:
+\begin{center}\small\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrlrrr@{}}\toprule
+Node & GFLOP/s & Build & $L$ & $T$ & \% SP peak\\\midrule
+DINE  & 361 & gcc, close/cores & 48 & 32 & 11.8\\
+DINE2 & 740 & clang, close/cores & 24 & 64 & 8.6\\
+\bottomrule\end{tabular}\end{center}
+Both use first-touch placement; interleaving pages ($-$14 to $-$23\,\%), SMT (DINE $-$30\,\%) and
+spreading a half node onto one socket all lose, as expected for a bandwidth-bound kernel. Clang beats gcc
+by 7--47\,\% on DINE2 only. % TODO(A): gc007 best-node result; cache-resident L<=16 maxima (848 / 2677).
+Runs: \texttt{analysis/data/tuning\_summary.csv}.
 % end A: best-case
 
 \section{Grid vs.\ LIKWID and the roofline}  % owner: D
