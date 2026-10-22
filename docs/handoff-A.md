@@ -43,7 +43,57 @@ git fetch login8.cosma.dur.ac.uk:/cosma/home/do022/dc-ta1/ccd main:a-cosma && gi
 None yet.
 
 ## 4. Still to submit before Fri 12:00
-TODO after smoke.
+Tuning sweep (§6), 3 repeats, `MAX_L=48`, from `~/ccd`. Keep ≤6 of our tasks pending per partition
+(`squeue --me -r -t PD -p ciuk-dine|ciuk-dine2`). Lines already submitted are listed in §3.
+**Status: waiting for Bobby's OK (Thu 21:50).**
+```bash
+cd ~/ccd
+TAG=tune-base MAX_L=48 scripts/submit.sh dine grid --array=16,32
+TAG=tune-base MAX_L=48 scripts/submit.sh dine2 grid --array=32,64
+TAG=tune-interleave NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-interleave NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-smt OMP_PLACES=threads MAX_L=48 scripts/submit.sh dine grid --array=64
+TAG=tune-smt OMP_PLACES=threads MAX_L=48 scripts/submit.sh dine2 grid --array=128
+TAG=tune-clang GRID_CONFIG=cpu-avx2-clang MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-unroll GRID_EXTRA=--dslash-unroll MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-unroll GRID_EXTRA=--dslash-unroll MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-spread OMP_PROC_BIND=spread MAX_L=48 scripts/submit.sh dine grid --array=16
+TAG=tune-spread OMP_PROC_BIND=spread MAX_L=48 scripts/submit.sh dine2 grid --array=32
+TAG=tune-spread-interleave OMP_PROC_BIND=spread NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine grid --array=16
+TAG=tune-spread-interleave OMP_PROC_BIND=spread NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine2 grid --array=32
+TAG=tune-asm GRID_EXTRA=--dslash-asm MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-base MAX_L=48 scripts/submit.sh dine grid --array=16,32
+TAG=tune-base MAX_L=48 scripts/submit.sh dine2 grid --array=32,64
+TAG=tune-interleave NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-interleave NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-smt OMP_PLACES=threads MAX_L=48 scripts/submit.sh dine grid --array=64
+TAG=tune-smt OMP_PLACES=threads MAX_L=48 scripts/submit.sh dine2 grid --array=128
+TAG=tune-clang GRID_CONFIG=cpu-avx2-clang MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-unroll GRID_EXTRA=--dslash-unroll MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-unroll GRID_EXTRA=--dslash-unroll MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-spread OMP_PROC_BIND=spread MAX_L=48 scripts/submit.sh dine grid --array=16
+TAG=tune-spread OMP_PROC_BIND=spread MAX_L=48 scripts/submit.sh dine2 grid --array=32
+TAG=tune-spread-interleave OMP_PROC_BIND=spread NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine grid --array=16
+TAG=tune-spread-interleave OMP_PROC_BIND=spread NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine2 grid --array=32
+TAG=tune-asm GRID_EXTRA=--dslash-asm MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-base MAX_L=48 scripts/submit.sh dine grid --array=16,32
+TAG=tune-base MAX_L=48 scripts/submit.sh dine2 grid --array=32,64
+TAG=tune-interleave NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-interleave NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-smt OMP_PLACES=threads MAX_L=48 scripts/submit.sh dine grid --array=64
+TAG=tune-smt OMP_PLACES=threads MAX_L=48 scripts/submit.sh dine2 grid --array=128
+TAG=tune-clang GRID_CONFIG=cpu-avx2-clang MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-unroll GRID_EXTRA=--dslash-unroll MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-unroll GRID_EXTRA=--dslash-unroll MAX_L=48 scripts/submit.sh dine2 grid --array=64
+TAG=tune-spread OMP_PROC_BIND=spread MAX_L=48 scripts/submit.sh dine grid --array=16
+TAG=tune-spread OMP_PROC_BIND=spread MAX_L=48 scripts/submit.sh dine2 grid --array=32
+TAG=tune-spread-interleave OMP_PROC_BIND=spread NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine grid --array=16
+TAG=tune-spread-interleave OMP_PROC_BIND=spread NUMACTL=--interleave=all MAX_L=48 scripts/submit.sh dine2 grid --array=32
+TAG=tune-asm GRID_EXTRA=--dslash-asm MAX_L=48 scripts/submit.sh dine2 grid --array=64
+```
 
 ## 5. Best case so far
 TODO (no Grid data).
