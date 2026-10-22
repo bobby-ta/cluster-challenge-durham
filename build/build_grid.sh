@@ -30,6 +30,8 @@ cp -r "$REPO/build/systems/cosma" "$SRC/systems/cosma"
 
 cd "$SRC"
 [[ -d $ENV_DIR ]] || ./bootstrap-env.sh "$ENV_DIR" cosma
+# bootstrap-env.sh copies the config only once; build-grid.sh reads that copy, so refresh it.
+cp "$REPO/build/systems/cosma/grid-config.json" "$ENV_DIR/grid-config.json"
 ./build-grid.sh "$ENV_DIR" "$CONFIG" "$NJOBS"
 # Both nodes share $SRC, where build-benchmark.sh runs autotools; don't let two builds race there.
 flock "$GRID_ENV_ROOT/src/.benchmark.lock" ./build-benchmark.sh "$ENV_DIR" "$CONFIG" "$NJOBS"
