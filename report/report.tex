@@ -70,8 +70,10 @@ DINE  & 361 & gcc, close/cores & 48 & 32 & 11.8\\
 DINE2 & 740 & clang, close/cores & 24 & 64 & 8.6\\
 \bottomrule\end{tabular}\end{center}
 Both use first-touch placement; interleaving pages ($-$14 to $-$23\,\%), SMT (DINE $-$30\,\%) and
-spreading a half node onto one socket all lose, as expected for a bandwidth-bound kernel. Clang beats gcc
-by 7--47\,\% on DINE2 only. % TODO(A): gc007 best-node result; cache-resident L<=16 maxima (848 / 2677).
+spreading a half node onto one socket all lose, as expected for a bandwidth-bound kernel. On DINE2 the
+OS numbers cores even/odd per socket, so default \texttt{close} placement puts neighbouring Grid threads
+on opposite sockets; socket-ordered places (\texttt{OMP\_PLACES=\{0\}:32:2,\{1\}:32:2}) gain up to 58\,\%
+($L=24$). Clang's apparent advantage on DINE2 is the same effect via LLVM's OpenMP runtime. % TODO(A): gc007 best-node result; cache-resident L<=16 maxima (848 / 2677).
 Runs: \texttt{analysis/data/tuning\_summary.csv}.
 % end A: best-case
 

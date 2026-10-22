@@ -131,8 +131,11 @@ TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 gri
 - *Half node*: DINE T=16 `close` = one socket: 219, vs `spread` (both sockets) 296 (**measured**: memory bandwidth
   of the second socket is worth +35 %). DINE2 T=32 `close` already spans both sockets (even/odd numbering) = 619,
   while `spread` lands on every *other* place = even cores = **socket 0 only** = 433. The same NUMA effect, mirrored.
-- *Compiler*: clang ≈ gcc on DINE (−2 %), but on DINE2 clang wins +47 % at L=24, +7 % at L=32, +39 % at L=48
-  (same nodes). Hypothesis: better AVX-512 code generation for Grid's SIMD wrappers; not proven.
+- *Compiler*: clang ≈ gcc on DINE (−2 %). On DINE2 clang "wins" +47 % at L=24 with default placement, **but
+  that is the OpenMP runtime, not the code generator**: clang binaries use LLVM libomp, which (hypothesis,
+  consistent with the data) orders `OMP_PLACES=cores` by socket/core rather than by OS CPU number, so they were
+  socket-ordered all along. Evidence: gcc with socket-ordered places 788 ≈ clang 740–747 (default or
+  socket-ordered) at L=24, and on contiguous-numbered gc007 gcc 796 ≈ clang 759.
 - *L*: DINE flat from 24 to 48 (~340–360), consistent with DRAM-bound for all L ≥ 24 (working set ≫ 16 MiB/CCX L3).
   DINE2 peaks at L=24/32 and drops at 48. L ≤ 16 is cache-resident and 2–4× faster on both nodes.
 - *`--dslash-unroll/asm`*: no-ops in Benchmark_Grid (see Decisions).
