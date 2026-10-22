@@ -50,7 +50,7 @@ GFLOP/s are single precision.
 scatter: equal per NUMA domain). Grid: \texttt{OMP\_NUM\_THREADS}=$T$, \texttt{OMP\_PROC\_BIND=close},
 \texttt{OMP\_PLACES=cores}; under likwid-perfctr, \texttt{-C N:0-}$(T{-}1)$. On DINE2 the OS numbers
 socket\,0 cores even and socket\,1 odd, so \texttt{close} with $T\le32$ still spans both sockets.
-\textbf{Experiments.} TODO(A) jobs / node-hours from \texttt{analysis/data/job\_count.csv}.
+\textbf{Experiments.} 121 Slurm jobs/array tasks (103 completed, 97 Grid), 20.9 node-hours by Thu 23:50 (\texttt{analysis/data/job\_count.csv}; TODO(A): final count Fri, incl.\ teammates\' jobs not in A\'s clone).
 
 \section{Node capability with likwid-bench}  % owners: B (DINE), C (DINE2)
 \subsection{DINE}
@@ -67,7 +67,7 @@ socket\,0 cores even and socket\,1 odd, so \texttt{close} with $T\le32$ still sp
 \begin{tabular}{@{}lrlrrr@{}}\toprule
 Node & GFLOP/s & Build & $L$ & $T$ & \% SP peak\\\midrule
 DINE  & 361 & gcc, close/cores & 48 & 32 & 11.8\\
-DINE2 & 828 & clang, SMT, socket-ordered & 24 & 128 & 9.6\\
+DINE2 & 828 & clang, SMT, by socket & 24 & 128 & 9.6\\
 \bottomrule\end{tabular}\end{center}
 Both use first-touch placement; interleaving pages ($-$14 to $-$23\,\%), SMT (DINE $-$30\,\%) and
 spreading a half node onto one socket all lose, as expected for a bandwidth-bound kernel. On DINE2 the
