@@ -33,7 +33,6 @@ git fetch login8.cosma.dur.ac.uk:/cosma/home/do022/dc-ta1/ccd main:a-cosma && gi
   All Grid data so far was submitted from dc-ta1 (job ids in §3; their `meta.txt` says `team=TODO-team-name`).
 - **D:** unknown whether D queued their own scaling; A's `cover-scaling` (1 repeat) + `perfctr-cover` (T=1 only)
   exist. D must read the DINE2 placement and perfctr-pinning notes in §7/§8.
-- Two DINE2 recons pending at 23:50 (12208435 gc002, 12208537 gc006).
 
 ## 2. Done
 - `646fc44` `.gitignore`: `!results/**/*.out`, `!results/**/*.log`.
@@ -255,6 +254,9 @@ from "alternating" placement.
   instead of `-C`, keeping `OMP_PROC_BIND=close OMP_PLACES=cores`; or `-C ... -s <skipmask>` to skip the MPI
   threads. Test one T=8 job before a campaign.
 
+- **DINE2 recon of every node (gc001–gc008, measured):** all number cores even/odd per socket **except gc007**
+  (contiguous); HWP on all except gc008. Recon jobs: 12208434 gc001, 12208435 gc002, 12208441 gc003,
+  12208481 gc004, 12208506 gc005, 12208537 gc006, 12208363 gc007, 12202855 gc008.
 - **DINE2 thread placement, the real cause of the "fast gc007" (measured, Thu 23:1x):** DINE2 recons:
   gc001, gc005, gc008 number cores even/odd per socket; gc007 is contiguous (socket 0 = 0–31). HWP is on
   gc001/5/7, off on gc008, so it's **not** HWP. With even/odd numbering and `OMP_PROC_BIND=close OMP_PLACES=cores`,
@@ -297,4 +299,3 @@ from "alternating" placement.
    ```
 3. If D wants counters at T>1: fix the perfctr pinning in `grid.sbatch` first (see Decisions), test one T=8 job.
 4. Re-run `python3 analysis/job_count.py` after the last job; update report §1 experiment count.
-5. Recons 12208435 (gc002) and 12208537 (gc006) were still pending at 23:50: collect + commit.
