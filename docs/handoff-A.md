@@ -65,9 +65,32 @@ TODO.
   (gnu_comp/14.1.0, likwid/5.5.1, openmpi/5.0.3), and serialises `build-benchmark.sh` with `flock`
   because both nodes share the source tree.
 
+- **`-mno-avx512fp16` on DINE2:** gcc 14 emits AVX512-FP16 `vmovw` for `-march=sapphirerapids`, which
+  the system assembler (binutils 2.35.2, RHEL 9) rejects. Grid's SP kernels use AVX-512F/FMA, never
+  FP16 arithmetic, so dropping only that extension is the smallest change; using pixi's binutils 2.46
+  via `-B` would also have swapped the linker.
+- **Default ACLs removed again:** on this VAST NFSv3 mount a default ACL (`g::---`) made
+  autoconf's `configure` non-executable. Privacy does not depend on it: `~` and `~/ciuk-grid` are
+  `drwx--S---`, so nobody else can traverse in.
+- **Clang:** pixi clang 20.1.8 links against a glibc 2.17 sysroot and cannot link COSMA's
+  openmpi (needs glibc 2.34). Clang configs use `CXX="clang++ --sysroot=/ --gcc-toolchain=/cosma/local/gcc/14.1.0"`
+  (gcc 14.1 libstdc++, LLVM libomp from pixi). Verified with an MPI+OpenMP test program.
+- **`--dslash-generic` dropped:** it is Grid's default (`WilsonKernelsStatic::Opt = OptGeneric`), so
+  `tune-generic` would duplicate `tune-base`. Candidates: `--dslash-unroll` (both), `--dslash-asm` (DINE2).
+- **Benchmark build:** grid-benchmark compiles 18 instantiation files (Sp4/SU4, ~9 min each,
+  ~3 GB RSS). These dominate the Benchmark_Grid build.
+- **My own mistakes, for the record:** editing `build_grid.sh` while a build was reading it broke the
+  first DINE run after the Grid install (fixed: edits are now swapped in with `mv`, and the script skips
+  an installed Grid); a `pkill -f` matched its own shell. No data was affected.
+
 ## 8. For B / C / D
 - **Everyone:** `.gitignore` now keeps `results/**/*.out|*.log`; `runlog.csv` merges with `union`.
   Please `git add results/slurm` with your next results commit.
+- **D (and C):** on DINE2 the OS numbers socket 0's cores **even** (0,2,…,62) and socket 1's **odd**,
+  SMT siblings 64–127 (`likwid-topology`, recon 12202855). So `OMP_PLACES=cores OMP_PROC_BIND=close`
+  with T≤32 spreads over **both** sockets on DINE2, unlike DINE (0–15 socket 0). Worth one line in §3.
+  On DINE each 16 MiB L3 slice serves **2 cores** (EPYC 7302: 4 cores per CCD, 2 per CCX).
+- **D:** `python3 -m unittest` fails on COSMA only because system python3.9 lacks matplotlib.
 - **D:** TODO Grid ready message.
 
 ## 9. Friday morning plan
