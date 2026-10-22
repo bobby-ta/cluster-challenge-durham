@@ -52,6 +52,14 @@ TODO (no Grid data).
 TODO.
 
 ## 7. Decisions
+- **RULE (after three self-inflicted breakages): never edit `build/`, `slurm/`, `config/` or `scripts/`
+  while any job from this clone is queued or running.** Jobs read these files live from NFS; an
+  in-place edit or even an atomic `mv` (stale NFS handle on compute nodes) kills them. Queue fixes,
+  apply them when `squeue --me` is empty.
+- **All four builds pass (21:37):** dine `cpu-avx2` + `cpu-avx2-clang`, dine2 `cpu-avx512` +
+  `cpu-avx512-clang` (build jobs 12208099, 12208114; 3–18 min each on a DINE node). `ldd` clean,
+  `GRID_UVM` on, Grid e2d607f, grid-benchmark c7457a8. DINE2 binaries can't run `--help` on the
+  login node (EPYC 7542, no AVX-512): checked on DINE2 by the smoke runs instead.
 - **Build location:** `$HOME/ciuk-grid` on /cosma/home (965 TB free). No do022 data dir was
   looked for, because policy forbids scanning /cosma5–8 and /snap7–8.
 - **Privacy is stricter than `o-rwx`:** `do022` is shared by all teams, so group access is removed
