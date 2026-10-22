@@ -17,8 +17,40 @@
 % Space budget (approx): 1 Setup 0.15p | 2 Node capability 0.7p | 3 Grid 0.8p | 4 Grid vs LIKWID 0.25p | 5 Conclusions 0.1p
 
 \section{Setup}            % owner: A
-% Hardware table (theoretical peaks with sources), software stack, compilers + ALL flags,
-% pinning policy, number of experiments run (time-efficiency mark).
+\begin{table}[h]\centering\small\setlength{\tabcolsep}{3pt}
+\caption{Nodes (one exclusive node per job). Peaks per node at base / max-turbo clock; DINE2
+DIMM speed and all-core clock unverified, so its values are vendor upper bounds.}
+\label{tab:hw}
+\resizebox{\columnwidth}{!}{\begin{tabular}{@{}lcc@{}}\toprule
+ & DINE & DINE2\\\midrule
+CPU & EPYC 7302 (Zen\,2) & Xeon Gold 6430 (SPR)\\
+Cores, SMT & 2$\times$16, 2-way & 2$\times$32, 2-way\\
+NUMA domains & 2 & 2\\
+L3 & 16$\times$16\,MiB (per 2 cores) & 2$\times$60\,MiB\\
+Memory & 512\,GB DDR4 & 2\,TB DDR5\\
+SIMD (build) & AVX2 (\texttt{znver2}) & AVX-512 (\texttt{sapphirerapids})\\
+DP peak [GFLOP/s] & 1536 / 1690 & 4301 / 6963$^\dagger$\\
+SP peak [GFLOP/s] & 3072 / 3379 & 8602 / 13926$^\dagger$\\
+DRAM [GB/s] & 409.6 (DDR4-3200) & 563.2$^\dagger$ (DDR5-4400)\\
+\bottomrule\end{tabular}}\\[1pt]
+{\footnotesize Topology from \texttt{lscpu}/\texttt{likwid-topology} (recon jobs 12198164, 12202855);
+peaks from \texttt{analysis/peaks.py}: sockets$\times$cores$\times$GHz$\times$FLOP/cycle (16/32 DP on
+Zen\,2/SPR), 2 sockets$\times$8 channels$\times$MT/s$\times$8\,B; AMD and Intel spec sheets. $^\dagger$vendor upper bound.
+DINE DIMM speed: TODO(B) confirm DDR4-3200.}
+\end{table}
+\textbf{Software.} Grid \texttt{e2d607f}, built with grid-benchmark \texttt{c7457a8} (the UK NNSS
+benchmark harness); GCC 14.1.0 (\texttt{gnu\_comp/14.1.0}), Open\,MPI 5.0.3 (one rank,
+\texttt{--mpi 1.1.1.1}), libraries (GMP, MPFR, HDF5, FFTW, LIME) from the harness's pixi env;
+LIKWID 5.5.1. Grid flags: \texttt{-O3 -fopenmp -march=znver2} / \texttt{-march=sapphirerapids},
+\texttt{--enable-simd=AVX2}/\texttt{AVX512}, \texttt{--enable-comms=mpi-auto}; full flags in each run's
+\texttt{build-flags.txt}. % TODO(A): clang build row if tune-clang ran
+Benchmark\_Grid runs with the brief's flags (FP64, sp4-2as, sp4-f and su4 benchmarks off), so its
+GFLOP/s are single precision.
+\textbf{Pinning.} likwid-bench: \texttt{-W N:...} on physical cores (compact: socket\,0 first;
+scatter: equal per NUMA domain). Grid: \texttt{OMP\_NUM\_THREADS}=$T$, \texttt{OMP\_PROC\_BIND=close},
+\texttt{OMP\_PLACES=cores}; under likwid-perfctr, \texttt{-C N:0-}$(T{-}1)$. On DINE2 the OS numbers
+socket\,0 cores even and socket\,1 odd, so \texttt{close} with $T\le32$ still spans both sockets.
+\textbf{Experiments.} TODO(A) jobs / node-hours from \texttt{analysis/data/job\_count.csv}.
 
 \section{Node capability with likwid-bench}  % owners: B (DINE), C (DINE2)
 \subsection{DINE}
@@ -29,9 +61,22 @@
 \section{Grid}              % owner: D
 % Fig: grid_scaling_<node>, grid_vs_L. Strong scaling, where it flattens and why; best-case throughput + config.
 
+% A: best-case — D may move into §3
+\paragraph{Best case.} TODO(A): Table of the highest median \texttt{Gflops\_dwf4} (SP, $\ge$3 repeats)
+per node with $L$, threads, build, binding, NUMA policy and Grid flags, and its fraction of the SP
+peak in Table~\ref{tab:hw}; source \texttt{analysis/data/tuning\_summary.csv}.
+% end A: best-case
+
 \section{Grid vs.\ LIKWID and the roofline}  % owner: D
 % Fig: roofline_<node>. Grid's AI from perfctr; Grid-reported vs counter-measured flops; Grid axpy vs likwid triad.
 
 \section{Conclusions}       % owner: A
+\begin{itemize}\setlength{\itemsep}{0pt}
+\item \textbf{Grid vs LIKWID:} % TODO(D): Grid SP GFLOP/s vs likwid peakflops_sp; axpy vs triad GB/s.
+\item \textbf{Roofline:} % TODO(D): Grid's AI (perfctr MEM/FLOPS_SP) vs ridge point; TODO(B/C): ridge points.
+\item \textbf{Strong scaling:} % TODO(D): efficiency at full node, saturation T; TODO(B/C): bandwidth knee T.
+\item \textbf{Weak scaling:} % TODO(D): matched L^4/T pairs, ratio.
+\item \textbf{Best case:} % TODO(A): number, config, % of SP peak.
+\end{itemize}
 
 \end{document}
