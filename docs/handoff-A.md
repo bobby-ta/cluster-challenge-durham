@@ -106,8 +106,42 @@ PERFCTR='MEM FLOPS_SP' TAG=perfctr-cover scripts/submit.sh dine2 grid --array=8,
 TAG=cover-scaling scripts/submit.sh dine2 grid --array=64
 ```
 
-## 5. Best case so far
-TODO (no Grid data).
+## 5. Best case so far (Thu 22:25, full sweep, `python3 analysis/tuning.py`)
+Headline is over the brief's sizes L ≥ 24 (median of 3 separate jobs, dwf4, GFLOP/s SP):
+
+| node | best median | config | L | T | jobs | % SP peak (base / turbo) |
+|---|---|---|---|---|---|---|
+| DINE | **361.4** (350.1–362.7) | gcc `cpu-avx2`, close/cores, first-touch | 48 | 32 | 12208201_32 12208221_32 12208264_32 | 11.8 % / 10.7 % of 3072 / 3379 |
+| DINE2 | **740.4** (738.5–742.6) | clang `cpu-avx512-clang`, close/cores, first-touch | 24 | 64 | 12208210_64 12208244_64 12208285_64 | 8.6 % / 5.3 % of 8602 / 13926 |
+
+Single best runs, labelled as maxima: DINE 368.7 (tune-base T=32 L=32); DINE2 878.1 (tune-smt T=128
+L=24, node **gc007**). Cache-resident L < 24 (separate, not headline): DINE 848.3 (clang L=16), DINE2 2677.4 (clang L=12).
+
+Reproduce:
+```bash
+TAG=tune-base MAX_L=48 scripts/submit.sh dine grid --array=32
+TAG=tune-clang GRID_CONFIG=cpu-avx512-clang MAX_L=48 scripts/submit.sh dine2 grid --array=64
+```
+
+**Knobs (L=32 unless stated; hypotheses unless marked measured):**
+- *Interleave* hurts on both: DINE −23 % (359→278), DINE2 −14 % (644→557). With first-touch each thread's
+  sites live in its own NUMA domain; interleave sends half the traffic across the socket link.
+- *SMT* (2 threads/core): DINE −30 % (359→250), DINE2 neutral (644→643). The kernel is bandwidth-bound,
+  so hiding latency gains nothing once DRAM is saturated, and on Zen 2 the extra threads also compete for L1/L2.
+- *Half node*: DINE T=16 `close` = one socket: 219, vs `spread` (both sockets) 296 (**measured**: memory bandwidth
+  of the second socket is worth +35 %). DINE2 T=32 `close` already spans both sockets (even/odd numbering) = 619,
+  while `spread` lands on every *other* place = even cores = **socket 0 only** = 433. The same NUMA effect, mirrored.
+- *Compiler*: clang ≈ gcc on DINE (−2 %), but on DINE2 clang wins +47 % at L=24, +7 % at L=32, +39 % at L=48
+  (same nodes). Hypothesis: better AVX-512 code generation for Grid's SIMD wrappers; not proven.
+- *L*: DINE flat from 24 to 48 (~340–360), consistent with DRAM-bound for all L ≥ 24 (working set ≫ 16 MiB/CCX L3).
+  DINE2 peaks at L=24/32 and drops at 48. L ≤ 16 is cache-resident and 2–4× faster on both nodes.
+- *`--dslash-unroll/asm`*: no-ops in Benchmark_Grid (see Decisions).
+- **Node variance on DINE2 (measured):** every gc007 run is 30–75 % faster at L=24 than the same config on
+  gc001/3/4/5/6/8 (base 799 vs ~500; smt 878 vs ~532; interleave 658 vs ~482). Grid axpy at L=48: gc007 340 GB/s
+  vs gc003 286 GB/s. Hypothesis: different DIMM population/speed on gc007 (recon was on gc008). DINE nodes agree within 4 %.
+
+**Untested combinations (Friday morning candidates):** DINE2 clang + SMT (T=128); clang on gc007; clang + spread at T=32
+is pointless (socket 0 only).
 
 ## 6. Smoke timing (Thu 21:46; jobs 12208156–12208159, all exit 0, `TAG=smoke`)
 | node | T | MAX_L | wall (runlog) | dwf4 L=24 | L=32 | L=48 GFLOP/s SP |
