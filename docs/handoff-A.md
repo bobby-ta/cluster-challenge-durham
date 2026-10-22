@@ -79,6 +79,16 @@ TODO.
   `tune-generic` would duplicate `tune-base`. Candidates: `--dslash-unroll` (both), `--dslash-asm` (DINE2).
 - **Benchmark build:** grid-benchmark compiles 18 instantiation files (Sp4/SU4, ~9 min each,
   ~3 GB RSS). These dominate the Benchmark_Grid build.
+- **`--enable-unified=no` removed (all configs):** with it, Grid on CPU emulates a separate device
+  memory with a 128 MiB software cache; both first smoke runs (12208088_8, 12208089_32) aborted in the
+  axpy benchmark with `GRID_ASSERT bytes<DeviceMaxBytes` (163,840,000 > 134,217,728) and would
+  otherwise pay host<->"device" copies. Grid's default is unified=yes, and grid-benchmark's own
+  `linux-x64` config doesn't set it. Rebuilt everything.
+- **Compile in jobs:** `slurm/build.sbatch` (+ offline path in `build_grid.sh`: `PREPARE_ONLY=1` clones and
+  bootstraps on the login node, the job compiles). Login node at ≤8 jobs needed ~40 min per node,
+  most of it in 18 grid-benchmark instantiation files. Build jobs: 12208097 (dine2 cpu-avx512),
+  12208098 (dine cpu-avx2-clang), 12208099 (dine cpu-avx2 + dine2 cpu-avx512-clang); 12208097's
+  dine:cpu-avx2 and 12208098's dine2:cpu-avx512-clang lost a race on `systems/cosma` (fixed, `ceb9218`).
 - **My own mistakes, for the record:** editing `build_grid.sh` while a build was reading it broke the
   first DINE run after the Grid install (fixed: edits are now swapped in with `mv`, and the script skips
   an installed Grid); a `pkill -f` matched its own shell. No data was affected.
