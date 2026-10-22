@@ -243,6 +243,15 @@ is pointless (socket 0 only).
   instead of `-C`, keeping `OMP_PROC_BIND=close OMP_PLACES=cores`; or `-C ... -s <skipmask>` to skip the MPI
   threads. Test one T=8 job before a campaign.
 
+- **DINE2 thread placement, the real cause of the "fast gc007" (measured, Thu 23:1x):** DINE2 recons:
+  gc001, gc005, gc008 number cores even/odd per socket; gc007 is contiguous (socket 0 = 0–31). HWP is on
+  gc001/5/7, off on gc008, so it's **not** HWP. With even/odd numbering and `OMP_PROC_BIND=close OMP_PLACES=cores`,
+  Grid thread i and i±1 (which share lattice faces) sit on opposite sockets. Socket-ordered places
+  `OMP_PLACES='{0}:32:2,{1}:32:2'` on even/odd node gc004 (12208553_64): dwf4 L24/32/48 = 795/702/624, the
+  same as gc007 base (792/703/622) and +58/+9/+42 % over default placement on even/odd nodes (502/644/439).
+  Hypothesis for the mechanism: cross-socket halo traffic between neighbouring threads; the size of the
+  effect fits it, but it is not measured directly.
+
 ## 8. For B / C / D
 - **Everyone:** `.gitignore` now keeps `results/**/*.out|*.log`; `runlog.csv` merges with `union`.
   Please `git add results/slurm` with your next results commit.
@@ -250,6 +259,11 @@ is pointless (socket 0 only).
   SMT siblings 64–127 (`likwid-topology`, recon 12202855). So `OMP_PLACES=cores OMP_PROC_BIND=close`
   with T≤32 spreads over **both** sockets on DINE2, unlike DINE (0–15 socket 0). Worth one line in §3.
   On DINE each 16 MiB L3 slice serves **2 cores** (EPYC 7302: 4 cores per CCD, 2 per CCX).
+- **D (most important):** on DINE2's even/odd nodes the default `close/cores` placement costs Grid up to
+  ~58 % (L=24) at T=64, because neighbouring threads land on opposite sockets. Socket-ordered
+  `OMP_PLACES='{0}:32:2,{1}:32:2'` removes it (see Decisions). Your untagged DINE2 scaling therefore mixes
+  node layouts: gc007 is contiguous, the others even/odd. Group by `host=` or state the placement caveat. For
+  T<64 the effect differs again (close T=32 = both sockets alternating on even/odd nodes, one socket on gc007).
 - **D (important):** DINE2 nodes differ (gc007: contiguous core numbering + HWP/turbo control; gc008: even/odd,
   no cpufreq driver). Check `host=` in each run's `meta.txt` before comparing DINE2 runs; half-node `close`
   runs are one socket on gc007 and two elsewhere. `MAX_L` < 32 is rejected by Benchmark_Grid.
