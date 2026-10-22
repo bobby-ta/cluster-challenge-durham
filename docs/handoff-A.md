@@ -28,8 +28,12 @@ git fetch login8.cosma.dur.ac.uk:/cosma/home/do022/dc-ta1/ccd main:a-cosma && gi
   not searched (site policy forbids scanning them).
 
 ## 1. Open items (need you / a teammate)
-- Team name + 4 COSMA usernames for `config/team.env` and the `setfacl` grants. Until then the
-  build is **only readable by dc-ta1**, so D's jobs cannot use it.
+- **Team name + 4 COSMA usernames** for `config/team.env` and the `setfacl` grants. Until then the build in
+  `/cosma/home/do022/dc-ta1/ciuk-grid` is readable only by dc-ta1, so D cannot run Grid from their account.
+  All Grid data so far was submitted from dc-ta1 (job ids in §3; their `meta.txt` says `team=TODO-team-name`).
+- **D:** unknown whether D queued their own scaling; A's `cover-scaling` (1 repeat) + `perfctr-cover` (T=1 only)
+  exist. D must read the DINE2 placement and perfctr-pinning notes in §7/§8.
+- Two DINE2 recons pending at 23:50 (12208435 gc002, 12208537 gc006).
 
 ## 2. Done
 - `646fc44` `.gitignore`: `!results/**/*.out`, `!results/**/*.log`.
