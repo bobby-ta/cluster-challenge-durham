@@ -1,0 +1,44 @@
+% Part D data contribution, Fri 23 Oct. Insert content into the Grid and
+% Grid-versus-LIKWID sections of report.tex; do not blindly \input this file
+% alongside duplicate headings or A's existing best-case paragraph.
+% Overnight CSVs: analysis/overnight-20261022T224854Z/
+% Clang20/OpenMPI4.1 physical-core series; distinct from A's GCC tuning.
+
+% Place under \section{Grid}, before A's separately sourced Best case.
+\paragraph{Strong scaling.}
+One MPI rank and explicit socket/core-ordered OpenMP placement were used for
+three independent runs per physical thread count. For the FP32 DWF4 kernel,
+fixed $L=24/32$ throughput grew from 21.6/20.4 to 352.6/350.6\,GFLOP/s
+on DINE (1 to 32 physical cores; 51.0/53.7\% efficiency). On DINE2, it grew
+from 35.2/32.5 to 768.9/695.4\,GFLOP/s (1 to 64 cores;
+34.1/33.5\% efficiency). DINE2's higher absolute throughput has lower
+per-core scaling efficiency at the largest tested counts.
+
+\paragraph{Weak scaling.}
+With Grid's fifth dimension held fixed, doubling $L$ from 24 to 48 increases
+the four-dimensional volume by $16\times$. The matched 2-to-32-thread
+comparison therefore holds $L^4/T$ constant and retains 56.4\% of per-core
+throughput on DINE versus 32.1\% on DINE2. Weak scaling also changes cache
+residency and socket placement, so it cannot by itself isolate a cause.
+
+% Place under \section{Grid vs.\ LIKWID and the roofline}.
+\paragraph{Measured roofline.}
+LIKWID full-node FP32 peaks were 3341/9287\,GFLOP/s and non-temporal
+DRAM roofs 231/398\,GB/s (DINE/DINE2), giving empirical ridge points
+14.49/23.34 FLOP/byte. Simultaneous whole-benchmark counters recorded
+259.3/505.9\,GFLOP/s and 164.7/243.6\,GB/s, with aggregate intensities
+1.57/2.08 SP FLOP/DRAM byte, below the ridge. These measurements include
+setup, multiple lattice sizes and non-DWF kernels; they do not give the
+operational intensity of an isolated $L=24$ or $L=32$ DWF kernel.
+
+\paragraph{Grid axpy vs. LIKWID.}
+At $L=64$ (3\,GiB working set) full-node FP64 Grid axpy reached
+174.4/350.4\,GB/s, or 97.6/89.1\% of separately measured temporal
+LIKWID triad useful-byte bandwidth (178.6/393.2\,GB/s). Grid's binary
+GiB/s were converted to decimal GB/s. This ratio compares different kernels
+and working sets; it is not hardware bandwidth utilisation.
+
+% A two-page report might accommodate one composite figure, not all four.
+% Use the regenerated PDFs in report/figs/overnight-20261022T224854Z/:
+% submission_strong_scaling.pdf, submission_weak_scaling.pdf,
+% submission_roofline.pdf, submission_axpy_vs_likwid.pdf.

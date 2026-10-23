@@ -57,5 +57,58 @@ reuse at half the recorded thread count. DINE2 requires fixed `flops`/`bw` runs.
 Rooflines use the same compute selection and fixed bandwidth runs. Figures with no
 valid source data are removed when plotting, so old charts cannot survive an exclusion.
 
-Part D (Grid scaling, weak scaling, counters and roofline): see [`docs/part-d.md`](docs/part-d.md).
-Run the offline collector/plot tests with `python3 -m unittest discover -s analysis -p 'test_*.py'`.
+## Friday 23 October results and submission update
+
+Part D has now completed the overnight Grid campaign; see
+[`docs/part-d.md`](docs/part-d.md) for measured methods, limitations, and
+report-ready values. The **95 successful / 97 recorded** runs are represented
+by the read-only exports in `analysis/overnight-20261022T224854Z/`.
+
+To regenerate the four team-presentation/report-ready PDFs **without running
+new cluster jobs**:
+
+```bash
+python3 analysis/plot_overnight_exports.py
+python3 -m unittest discover -s analysis -p 'test_*.py'
+```
+
+The generated figures are `report/figs/overnight-20261022T224854Z/submission_*.pdf`.
+The source export CSVs and original figures are not modified. `plots.py`
+remains the **teammate GCC campaign** plotter; the new script is the separate
+**Clang overnight** plotter. Do not concatenate the two families by the common
+`cpu-avx2`/`cpu-avx512` labels.
+
+For the team's two-page LaTeX submission, the **ready-to-insert** Part D
+paragraphs are in `report/part-d-insert.tex`. Move the first two paragraphs
+into the existing `Grid` section, and the last two into `Grid vs. LIKWID`.
+Keep the separately sourced A best-case tuning paragraph. Do not copy the
+helper file unchanged into the report: its explanatory comments intentionally
+retain the placement and duplicate-heading cautions. The report still awaits
+final B/C wording and layout verification against the strict two-page limit.
+
+### If you want to refresh the teammate analysis from raw jobs
+
+```bash
+python3 analysis/collect.py
+(cd analysis && python3 plots.py)
+```
+
+Run the collector **before** the generic plotter. The repaired collector keeps
+build/runtime, host, affinity, and test-case provenance so valid but
+non-comparable jobs are not merged into attractive yet incorrect scaling lines.
+Legacy separate counter jobs without explicit pairing IDs stay separate; use
+the separately validated overnight whole-process counter CSV for the submitted
+roofline. The ordinary offline tests check both these provenance requirements
+and the overnight exported values.
+
+### What this archive does not prove
+
+The provided overnight RAR contained derived CSVs and publication figures,
+**not the COSMA raw per-job `record.json`/`result.json`, build logs, or final
+Slurm accounting**. A raw-results export would support independent replay of
+every accepted measurement. Do not claim those files were packaged.
+
+The original B report's DINE cache figure uses a known-excluded half-node
+SMT dataset (12200764) in its all-core panel; remove or regenerate that panel
+before the final team report. See `docs/submission-review.md` for other
+submission checks. The queue closes at **16:00 BST on Friday 23 October**.
