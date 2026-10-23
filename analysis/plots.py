@@ -73,15 +73,14 @@ def band(ax, g, x, y, color, label, ls="-"):
 
 
 def flops_rows(d):
-    """Fixed compute runs plus the specifically validated legacy DINE AVX runs."""
+    """Fixed compute runs only (one thread per physical core), same method on both nodes.
+
+    The legacy DINE "threads" jobs 12200761-3 (2 SMT threads per core) matched the fixed run
+    for AVX kernels but are left out so DINE and DINE2 use an identical method.
+    """
     compute = d.kernel.str.startswith("peakflops", na=False)
-    # DINE's even compact AVX rows matched the fixed run after converting SMT
-    # threads to physical cores. This comparison does not establish reuse on DINE2.
-    old = d[(d.node == "dine") & d.job.astype(str).isin(["12200761", "12200762", "12200763"])
-            & (d["mode"] == "threads") & compute & d.kernel.str.contains("avx", na=False)
-            & (d.placement == "compact") & (d.threads % 2 == 0)].assign(threads=lambda x: x.threads // 2)
     fixed = d[(d["mode"] == "flops") & compute & (d.placement == "compact")]
-    return pd.concat([old, fixed]).assign(GFlops=lambda x: x.MFlops / 1e3)
+    return fixed.assign(GFlops=lambda x: x.MFlops / 1e3)
 
 
 def likwid_plots(df):
