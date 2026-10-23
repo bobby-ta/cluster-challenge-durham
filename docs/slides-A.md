@@ -1,6 +1,6 @@
 # Slides: A (setup, best-case tuning, time efficiency)
 
-Team: TODO-team-name. Users: TODO ×4 (fill from `config/team.env`).
+Team: UCLuster Too. Users: dc-loke1, dc-ge2, dc-huan6, dc-ta1.
 
 ## Slide 1: Setup: two very different nodes
 - DINE: 2× EPYC 7302 (Zen 2), 32 cores, 2 NUMA, L3 16 MiB per 2-core CCX, 512 GB DDR4.
