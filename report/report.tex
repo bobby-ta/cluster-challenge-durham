@@ -50,7 +50,7 @@ GFLOP/s are single precision.
 scatter: equal per NUMA domain). Grid: \texttt{OMP\_NUM\_THREADS}=$T$, \texttt{OMP\_PROC\_BIND=close},
 \texttt{OMP\_PLACES=cores}; under likwid-perfctr, \texttt{-C N:0-}$(T{-}1)$. On DINE2 the OS numbers
 socket\,0 cores even and socket\,1 odd, so \texttt{close} with $T\le32$ still spans both sockets.
-\textbf{Experiments.} 121 Slurm jobs/array tasks (103 completed, 97 Grid), 20.9 node-hours by Thu 23:50 (\texttt{analysis/data/job\_count.csv}; TODO(A): final count Fri, incl.\ teammates\' jobs not in A\'s clone).
+\textbf{Experiments.} 205 Slurm jobs/array tasks by the team (178 completed), 28.5 node-hours by Fri 01:30 (\texttt{analysis/data/job\_count.csv}; TODO(A): final count after the last Friday job).
 
 \section{Node capability with likwid-bench}  % owners: B (DINE), C (DINE2)
 \subsection{DINE}
@@ -67,14 +67,14 @@ socket\,0 cores even and socket\,1 odd, so \texttt{close} with $T\le32$ still sp
 \begin{tabular}{@{}lrlrrr@{}}\toprule
 Node & GFLOP/s & Build & $L$ & $T$ & \% SP peak\\\midrule
 DINE  & 361 & gcc, close/cores & 48 & 32 & 11.8\\
-DINE2 & 828 & clang, SMT, by socket & 24 & 128 & 9.6\\
+DINE2 & 864 & gcc, SMT, by socket & 24 & 128 & 10.0\\
 \bottomrule\end{tabular}\end{center}
 Both use first-touch placement; interleaving pages ($-$14 to $-$23\,\%), SMT (DINE $-$30\,\%) and
 spreading a half node onto one socket all lose, as expected for a bandwidth-bound kernel. On DINE2 the
 OS numbers cores even/odd per socket, so default \texttt{close} placement puts neighbouring Grid threads
 on opposite sockets; socket-ordered places (\texttt{OMP\_PLACES=\{0\}:32:2,\{1\}:32:2}) gain up to 58\,\%
 ($L=24$). Clang's apparent advantage on DINE2 is the same effect via LLVM's OpenMP runtime; SMT adds a
-further 10\,\% there once placement is fixed. Cache-resident $L\le16$ reaches 848 (DINE) and 2692 (DINE2) GFLOP/s.
+further 9\,\% there once placement is fixed. Cache-resident $L\le16$ reaches 848 (DINE) and 2692 (DINE2) GFLOP/s.
 Runs: \texttt{analysis/data/tuning\_summary.csv}.
 % end A: best-case
 
@@ -87,7 +87,7 @@ Runs: \texttt{analysis/data/tuning\_summary.csv}.
 \item \textbf{Roofline:} % TODO(D): Grid's AI (perfctr MEM/FLOPS_SP) vs ridge point; TODO(B/C): ridge points.
 \item \textbf{Strong scaling:} % TODO(D): efficiency at full node, saturation T; TODO(B/C): bandwidth knee T.
 \item \textbf{Weak scaling:} % TODO(D): matched L^4/T pairs, ratio.
-\item \textbf{Best case:} 361 (DINE) and 828 (DINE2) GFLOP/s SP at $L\ge24$, 10--12\,\% of SP peak: placement and NUMA locality, not FLOPs, set the ceiling.
+\item \textbf{Best case:} 361 (DINE) and 864 (DINE2) GFLOP/s SP at $L\ge24$, 10--12\,\% of SP peak: placement and NUMA locality, not FLOPs, set the ceiling.
 \end{itemize}
 
 \end{document}

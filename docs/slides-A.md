@@ -16,14 +16,14 @@ Team: UCLuster Too. Users: dc-loke1, dc-ge2, dc-huan6, dc-ta1.
 - Knobs tried: binding (close/spread), NUMA (first-touch/interleave), SMT, compiler (gcc/clang),
   Wilson kernel (`--dslash-unroll`, `--dslash-asm`), threads (full/half node), L ≤ 48.
 - Best per node (dwf4 SP, median of 3, L ≥ 24): DINE 361 GFLOP/s (gcc, 32 threads, 11.8 % of SP peak);
-  DINE2 828 GFLOP/s (clang, 128 threads, socket-ordered places, 9.6 %).
+  DINE2 864 GFLOP/s (gcc, 128 threads = SMT, socket-ordered places, 10.0 %).
 - Biggest lever: thread placement. DINE2 numbers cores even/odd, so default `close` puts neighbouring threads
   on opposite sockets; socket-ordered places +58 % at L=24. The "clang wins" and "gc007 is fast" results were both this effect.
-- Interleave −14 to −23 %, SMT −30 % (DINE) / +10 % (DINE2 once placement is fixed). Kernel flags are ignored by Benchmark_Grid.
+- Interleave −14 to −23 %, SMT −30 % (DINE) / +9 % (DINE2 once placement is fixed). Kernel flags are ignored by Benchmark_Grid.
 - Figure: bar chart of median dwf4 per tag per node with min/max whiskers (`tuning_summary.csv`).
 
 ## Slide 3: Time efficiency
-- 121 jobs/array tasks, 103 completed, 20.9 node-hours by Thu 23:50 (A's clone; final count Fri).
+- 205 jobs/array tasks by the team, 178 completed, 28.5 node-hours by Fri 01:30 (final count Fri).
 - Arrays where the task id is the thread count, ≤ 1 h exclusive jobs, repeats as separate submissions
   (honest error bars), overnight queue kept topped up.
 - Everything reproducible: `scripts/submit.sh`, and each run has `meta.txt` (git hash, modules, env),

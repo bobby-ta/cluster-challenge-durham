@@ -28,9 +28,12 @@ git fetch login8.cosma.dur.ac.uk:/cosma/home/do022/dc-ta1/ccd main:a-cosma && gi
   not searched (site policy forbids scanning them).
 
 ## 1. Open items (need you / a teammate)
-- **Team name + 4 COSMA usernames** for `config/team.env` and the `setfacl` grants. Until then the build in
-  `/cosma/home/do022/dc-ta1/ciuk-grid` is readable only by dc-ta1, so D cannot run Grid from their account.
-  All Grid data so far was submitted from dc-ta1 (job ids in §3; their `meta.txt` says `team=TODO-team-name`).
+- **Done Fri 01:25:** team **UCLuster Too**, users dc-loke1 dc-ge2 dc-huan6 dc-ta1 in `config/team.env` (`3b8074d`).
+  ACLs: `u:<user>:x` on `~`, `-R` and default `u:<user>:rX` on `~/ciuk-grid` for dc-loke1, dc-ge2, dc-huan6
+  (verified with `getfacl`; group/other stay `---`). **Every job submitted before `3b8074d` has
+  `team=TODO-team-name` in its `meta.txt`**: that is all of A's Grid jobs (12208088–12208914); the report must
+  state the team for them. If a rebuild is ever needed, run `setfacl -R -k ~/ciuk-grid` first (default ACLs broke
+  autoconf here once) and re-grant afterwards.
 - **D:** unknown whether D queued their own scaling; A's `cover-scaling` (1 repeat) + `perfctr-cover` (T=1 only)
   exist. D must read the DINE2 placement and perfctr-pinning notes in §7/§8.
 
@@ -126,16 +129,16 @@ Headline is over the brief's sizes L ≥ 24 (median of 3 separate jobs, dwf4, GF
 | node | best median | config | L | T | jobs | % SP peak (base / turbo) |
 |---|---|---|---|---|---|---|
 | DINE | **361.4** (350.1–362.7) | gcc `cpu-avx2`, `close`, `OMP_PLACES=cores`, first-touch | 48 | 32 | 12208201_32 12208221_32 12208264_32 | 11.8 % / 10.7 % of 3072 / 3379 |
-| DINE2 | **827.5** (824.4–833.4) | clang `cpu-avx512-clang`, `close`, `OMP_PLACES='{0,64}:32:2,{1,65}:32:2'` (socket-ordered SMT pairs), first-touch, `-x gc007` | 24 | 128 | 12208577_128 12208589_128 12208600_128 | 9.6 % / 5.9 % of 8602 / 13926 |
+| DINE2 | **864.2** (863.6–880.4) | gcc `cpu-avx512`, `close`, `OMP_PLACES='{0,64}:32:2,{1,65}:32:2'` (socket-ordered SMT pairs), first-touch, `-x gc007` | 24 | 128 | 12208909_128 12208911_128 12208913_128 | 10.0 % / 6.2 % of 8602 / 13926 |
 
-Single best runs, labelled as maxima: DINE 368.7 (tune-base T=32 L=32); DINE2 878.1 (gcc tune-smt T=128 L=24 on
-gc007, whose numbering is already socket-contiguous). Cache-resident L < 24 (not headline): DINE 848.3 (clang L=16),
+Single best runs, labelled as maxima: DINE 368.7 (tune-base T=32 L=32); DINE2 880.4 (tune-smt-sockorder T=128 L=24).
+Runner-up DINE2: clang + SMT + socket-ordered 827.5 (12208577/89/600). Cache-resident L < 24 (not headline): DINE 848.3 (clang L=16),
 DINE2 2691.8 median / 2829.9 max (clang socket-ordered, L=12).
 
 Reproduce:
 ```bash
 TAG=tune-base MAX_L=48 scripts/submit.sh dine grid --array=32
-TAG=tune-clang-smt-sockorder GRID_CONFIG=cpu-avx512-clang OMP_PLACES='{0,64}:32:2,{1,65}:32:2' MAX_L=48 scripts/submit.sh dine2 grid -x gc007 --array=128
+TAG=tune-smt-sockorder OMP_PLACES='{0,64}:32:2,{1,65}:32:2' MAX_L=48 scripts/submit.sh dine2 grid -x gc007 --array=128
 ```
 
 **Knobs (L=32 unless stated; hypotheses unless marked measured):**
@@ -161,7 +164,10 @@ TAG=tune-clang-smt-sockorder GRID_CONFIG=cpu-avx512-clang OMP_PLACES='{0,64}:32:
 - *SMT on DINE2*: +3–10 % on top of good placement (clang 748→828 at L=24 socket-ordered); latency hiding helps
   once cross-socket traffic is gone. On DINE SMT loses 30 %.
 
-**Untested combinations (Friday morning candidates):** gcc + SMT + socket-ordered pairs on even/odd DINE2 nodes
+- *Half node, socket-ordered (= one socket, 32 cores) on DINE2* (12208910/12/14): L=32 423 vs 618 for default
+  T=32 (alternating = both sockets); L=24 392 vs 421. At half node, two sockets' bandwidth beats neighbour locality.
+
+**Previously untested combinations (all run Fri 00:55, see above):** gcc + SMT + socket-ordered pairs on even/odd DINE2 nodes
 (gcc SMT on gc007 gave the single max 878); half node (T=32) socket-ordered on DINE2 to separate "one socket"
 from "alternating" placement.
 
@@ -298,9 +304,8 @@ from "alternating" placement.
 - **D:** TODO Grid ready message.
 
 ## 9. Friday morning plan (submit everything by 12:00; queues close 16:00)
-1. Bobby: push A's commits (top of this file); send D/C the messages below; get usernames → A fills
-   `config/team.env` (`config: team name and users`) and runs the `setfacl` grants (§3.3) **while no job is queued**.
-2. **Already queued Fri 00:55** (12208909–14, see §3): only collect them. These were the commands:
+1. Bobby: push A's commits (top of this file); send D/C the messages below. Usernames and ACLs: done.
+2. **Done** (12208909–14 collected and committed). These were the commands:
    ```bash
    cd ~/ccd
    for r in 1 2 3; do
