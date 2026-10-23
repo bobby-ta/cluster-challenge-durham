@@ -107,6 +107,43 @@ axpy rates are partly cache-served and cannot be called DRAM bandwidth.
 For slides, see `docs/slides-D.md`. For team submission checks, see
 `docs/submission-review.md`.
 
+## Optional DINE2 socket-placement contribution
+
+The supplied `partD_socket_patch_20261023.zip` adds a separate GCC AVX-512
+close-versus-spread comparison, its PDF/PNG figure, and
+`report/part-d-socket-insert.tex`. Keep this comparison separate from the
+Clang/OpenMPI overnight curves and A's existing best-case results.
+
+The figure and paragraph are imported artifacts. The ZIP and the repository
+at integration time contain no raw `grid-final-one-socket` or
+`grid-final-two-socket` jobs, so their numerical claims cannot yet be
+independently reproduced from this checkout. The existing tracked `grid.csv`
+also predates the collector's provenance fields. Regenerating that CSV alone
+does not supply the missing jobs.
+
+To reproduce the figure after importing the original job records:
+
+```bash
+python3 analysis/collect.py
+python3 analysis/plot_dine2_socket.py
+```
+
+Import each job's `meta.txt`, `build-flags.txt`, `ldd.txt`, `result.json`,
+and completion entry in `results/runlog.csv`. The plot requires three distinct
+completed jobs per placement/thread setting, FP32 rows at L24/L32 and
+24/32 threads, and matching host, build, runtime and workload metadata. It
+rejects missing measurements or incompatible provenance. A separately
+collected CSV can be supplied with `--data /path/to/grid.csv`; `--output`
+selects the PDF path and also writes a PNG beside it. Paths default to this
+repository regardless of the current working directory.
+
+For the report, the fragment is compatible with the existing LaTeX preamble.
+From `report/`, place `\input{part-d-socket-insert}` within the Grid section
+only after reviewing the evidence and two-page space budget. The optional
+figure uses `\includegraphics[width=\linewidth]{dine2_socket_placement.pdf}`
+with the existing `\graphicspath{{figs/}}`. Neither is automatically inserted
+into `report.tex`.
+
 ## Earlier local audit and legacy counter placement
 
 The separate 22 October local audit of `ciuk_durham_evidence.zip` recorded
