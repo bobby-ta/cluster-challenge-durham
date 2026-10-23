@@ -1,0 +1,65 @@
+built=2026-10-22T23:59:00+01:00
+host=login5c.pri.cosma.local
+node-target=dine
+config=cpu-avx2
+benchmark-commit=c7457a85b6a0d9d1578838af11477cb41b1a5764
+grid-commit=e2d607f6c708362050ec26cbe89fc971a1a879c5
+workers=4
+CXXFLAGS=-O3 -fopenmp -march=znver2
+
+Compiler
+/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/bin/clang++
+clang version 20.1.8 (https://github.com/conda-forge/clangdev-feedstock 51599a0e3ed5a8b0e89061700fd078088955c745)
+Target: x86_64-conda-linux-gnu
+Thread model: posix
+InstalledDir: /cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/bin
+Configuration file: /cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/bin/x86_64-conda-linux-gnu-clang++.cfg
+
+MPI wrapper
+/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/bin/mpicxx
+clang++ -I/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/include -pthread -I/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/include -L/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/lib -L/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/lib -Wl,-rpath,/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/lib -lmpi
+
+Pixi
+pixi 0.58.0
+
+Grid configuration
+{
+  "configs": [
+    {
+      "name": "cpu-avx2",
+      "env-script": "toolchain.sh",
+      "commit": "e2d607f6c708362050ec26cbe89fc971a1a879c5",
+      "config-options": "--enable-comms=mpi-auto --enable-simd=AVX2 --enable-accelerator=none --enable-unified=no",
+      "env": {
+        "CC": "clang",
+        "CXX": "clang++",
+        "MPICXX": "mpicxx",
+        "OMPI_CC": "clang",
+        "OMPI_CXX": "clang++",
+        "CXXFLAGS": "-O3 -fopenmp -march=znver2"
+      },
+      "pixi-env": "cpu-linux"
+    },
+    {
+      "name": "cpu-avx512",
+      "env-script": "toolchain.sh",
+      "commit": "e2d607f6c708362050ec26cbe89fc971a1a879c5",
+      "config-options": "--enable-comms=mpi-auto --enable-simd=AVX512 --enable-accelerator=none --enable-unified=no",
+      "env": {
+        "CC": "clang",
+        "CXX": "clang++",
+        "MPICXX": "mpicxx",
+        "OMPI_CC": "clang",
+        "OMPI_CXX": "clang++",
+        "CXXFLAGS": "-O3 -fopenmp -march=sapphirerapids"
+      },
+      "pixi-env": "cpu-linux"
+    }
+  ]
+}
+
+Grid resolved flags
+-I/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/include -I/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/include -I/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/.pixi/envs/cpu-linux/include -mavx2 -mfma -mf16c -O3 -O3 -fopenmp -march=znver2 -fno-strict-aliasing -I/cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/prefix/grid_cpu-avx2/include
+
+Binary checksum
+73200dfa0ee2c38a66080753ad61fab09c7850a06993693f89e5cae7a9a72b18  /cosma/apps/do022/dc-huan6/ciuk-grid-overnight-20261022/dine/env/prefix/gridbench_cpu-avx2/bin/Benchmark_Grid

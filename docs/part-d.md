@@ -94,9 +94,11 @@ axpy rates are partly cache-served and cannot be called DRAM bandwidth.
   from the overnight scaling campaign.
 - `runs.csv`: 97 unique recorded invocations, 95 successful, two historical
   original smoke failures; both smokes were successfully replaced. Figures
-  use validated successful exports. **The RAR does not contain raw per-job
-  records, build flags, Slurm logs or final four-user accounting.** Import
-  those separately from COSMA before claiming full raw-level reproducibility.
+  use validated successful exports. The subsequent raw-results ZIP supplies
+  all 97 matching records, benchmark outputs, build flags and runtime logs.
+  Run `python3 analysis/check_overnight_raw.py` to check coverage; see
+  `docs/overnight-raw-audit-20261023.md`. Campaign-level Slurm accounting and
+  the final four-user resource totals still need to be collected separately.
 - The latest brief requires maximum bandwidth and compute on both nodes but
   does not mandate a DINE2 LIKWID 1-to-64-core saturation sweep. That
   optional deeper study should not delay integration of valid D data.

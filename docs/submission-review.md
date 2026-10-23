@@ -14,8 +14,8 @@ The brief asks for maximum compute performance and memory bandwidth. It does not
 
 | Area | Evidence available | Remaining action or limit |
 |---|---|---|
-| DINE strong scaling | Overnight medians at fixed L, up to 32 physical-core threads | Imported, recalculated and plotted from verified export; original remote per-job metadata still absent |
-| DINE2 strong scaling | Overnight medians at fixed L, up to 64 physical-core threads | Imported, recalculated and plotted from verified export; original remote per-job metadata still absent |
+| DINE strong scaling | Overnight medians at fixed L, up to 32 physical-core threads; all 44 source records retained | Imported, recalculated and plotted from verified export; raw records match the export |
+| DINE2 strong scaling | Overnight medians at fixed L, up to 64 physical-core threads; all 53 source records retained | Imported, recalculated and plotted from verified export; raw records match the export |
 | Weak scaling | Matched exact pairs: L24/T2 to L48/T32 on both nodes. Additional DINE2 pair L24/T4 to L48/T64 | Label these within-node tests. The additional DINE2 full-node pair has a different work-per-thread baseline |
 | Counter roofline | Six process-wide SP/DRAM estimates. Full-node rows are simultaneous measurements | Use SP roofs and explicit whole-process labels. Keep lower-thread separate-pass estimates approximate |
 | A's best configurations | Raw JSON reproduces 361.403 GFLOP/s DINE and 864.215 GFLOP/s DINE2 medians | Keep separate from the overnight scaling build. Preserve repeat ranges and clarify 128 SMT threads versus 64 cores |
@@ -23,7 +23,7 @@ The brief asks for maximum compute performance and memory bandwidth. It does not
 | DINE2 LIKWID | Overnight full-node ceilings are available through the supplied analysis. Legacy teammate sweeps have documented pinning exclusions | Check the full-node source records for B/C's maximum-performance discussion. Do not reuse excluded sweeps or invent a saturation thread count |
 | Report and figures | Four verified PDF figures live in `report/figs/overnight-20261022T224854Z/submission_*.pdf`; insert-ready paragraphs are `report/part-d-insert.tex` | Team must insert D into `report/report.tex`, complete B/C, compile and confirm the strict two-page report limit |
 | Presentation | `docs/slides-D.md` supplies three D slides with notes and viva answers | Merge into the team deck. This Markdown file is not a completed PPTX or PDF presentation |
-| Provenance | Teammate raw tuning files are auditable. The supplied overnight archive contains derived analysis and figures but no raw job directories | Include or retain the raw `results/.../grid-overnight-20261022T224854Z/` directories before claiming end-to-end runtime verification. CSV calculations are independently checkable already |
+| Provenance | Teammate raw tuning files and all 97 overnight records are retained, including both failed smoke runs | Run `python3 analysis/check_overnight_raw.py`; see `docs/overnight-raw-audit-20261023.md`. Campaign-level Slurm accounting remains absent; provenance coverage alone does not validate every numerical interpretation |
 
 ## Part D numbers to carry into the report
 
@@ -57,7 +57,7 @@ At L64, the Grid memory benchmark uses 3,072 MiB and reaches median useful-byte 
 
 ## Code risks addressed by the integration review
 
-The repaired collector and plotter address the following issues. **All 26 offline tests pass**, including provenance, failed-group and counter-pairing regressions; the separately validated overnight CSV generator also passes its numeric checks. This verifies local processing, not any missing original remote logs.
+The repaired collector and plotter address the following issues. **All 26 offline tests pass**, including provenance, failed-group and counter-pairing regressions; the separately validated overnight CSV generator also passes its numeric checks. The raw-record verifier now checks all 97 exported invocations against the supplied source records. These checks verify local processing and record coverage; campaign-level Slurm accounting remains a separate requirement.
 
 1. **Tagged experiments hidden from plots.** The old plot selector expected untagged `grid` experiments and could omit `grid-cover-scaling`. The selector must accept an explicit baseline family while excluding tuning and instrumentation from the same curve.
 2. **Mixed provenance.** Grouping only by node, nominal config, threads and L can combine different compilers, runtimes or affinity layouts. Keep build, runtime, host/placement and workload metadata available, and aggregate only compatible observations.
@@ -65,7 +65,7 @@ The repaired collector and plotter address the following issues. **All 26 offlin
 4. **Incompatible counter pairing.** Join SP and DRAM only from the same run or an explicit matching pair with compatible provenance, workload and runtime. Never pair by thread count alone.
 5. **Bandwidth unit mismatch.** Grid can label binary GiB/s-like output as GB/s. Preserve the original field and convert to decimal GB/s consistently before comparing with LIKWID.
 6. **Runtime aggregation error.** A summary `STAT` maximum is a maximum, not the sum of replicated per-core runtime fields. Preserve the aggregation meaning when applying runtime-matching checks.
-7. **Unimported overnight raw records.** The teammate collector and the overnight `record.json` format differ. A separate adapter or explicit imported analysis path must preserve their identities. A generic recursive scan must not silently reinterpret them as ordinary teammate runs.
+7. **Distinct overnight raw-record format.** The teammate collector and the overnight `record.json` format differ. All 97 source records are now imported; the generic collector excludes those directories and preserves the separate overnight analysis path.
 8. **Stale files mistaken for fresh output.** Remove or mark generated figures whose current source data is absent. Verify all figures referenced by the report come from the selected input snapshot.
 
 Synthetic unit tests can check these parsing and calculation rules. They do not prove that the original jobs used the intended hardware or that a missing raw counter log was valid.

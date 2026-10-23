@@ -60,11 +60,13 @@ The two build families must not be silently pooled.
 
 ## Source evidence limitations
 
-The ZIP includes the overnight derived exports and figures, not original
-`record.json`/`result.json`/job logs or the final Slurm accounting. If your
-team needs per-run independent verification, export the original COSMA
-`results/*/grid-overnight-20261022T224854Z/` files separately and retain
-the compiler flags/runtime environments used by that campaign.
+The earlier analysis ZIP included derived exports and figures. The subsequent
+raw-results update adds both `results/*/grid-overnight-20261022T224854Z/` trees,
+including all 97 matching records and both failures. Run
+`python3 analysis/check_overnight_raw.py` to verify their coverage against the
+existing export. See `docs/overnight-raw-audit-20261023.md` for the import audit.
+Campaign-level Slurm `accounting.tsv` and `jobs.tsv` still need to be supplied
+separately if required for complete team resource accounting.
 
 The earlier DINE B all-core cache figure partly uses an excluded
 half-node SMT run (12200764). Regenerate or remove that panel before final

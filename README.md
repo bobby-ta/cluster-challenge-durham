@@ -64,6 +64,18 @@ Part D has now completed the overnight Grid campaign; see
 report-ready values. The **95 successful / 97 recorded** runs are represented
 by the read-only exports in `analysis/overnight-20261022T224854Z/`.
 
+The matching raw evidence is preserved in
+`results/{dine,dine2}/grid-overnight-20261022T224854Z/`: **44 DINE + 53 DINE2
+records**, including both failed runs. Verify coverage with:
+
+```bash
+python3 analysis/check_overnight_raw.py
+```
+
+See [`docs/overnight-raw-audit-20261023.md`](docs/overnight-raw-audit-20261023.md)
+for the import audit. The raw campaign retains its original layout and bytes;
+the generic collector leaves it to the separate overnight analysis.
+
 To regenerate the four team-presentation/report-ready PDFs **without running
 new cluster jobs**:
 
@@ -103,10 +115,11 @@ and the overnight exported values.
 
 ### What this archive does not prove
 
-The provided overnight RAR contained derived CSVs and publication figures,
-**not the COSMA raw per-job `record.json`/`result.json`, build logs, or final
-Slurm accounting**. A raw-results export would support independent replay of
-every accepted measurement. Do not claim those files were packaged.
+The earlier overnight RAR contained derived CSVs and publication figures.
+The subsequent raw-results ZIP now supplies all 97 matching per-job records,
+benchmark outputs, build flags and runtime logs. Campaign-level Slurm
+`accounting.tsv` and `jobs.tsv` remain absent, so this evidence does not establish
+complete resource accounting for the team.
 
 The original B report's DINE cache figure uses a known-excluded half-node
 SMT dataset (12200764) in its all-core panel; remove or regenerate that panel
