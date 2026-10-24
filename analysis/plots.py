@@ -128,11 +128,29 @@ def likwid_plots(df):
                 s["size"].str.extract(r"([kMG])B")[0].map({"k": 1, "M": 1024, "G": 1024**2})
             s["GBps"] = s.MBps / 1e3
             fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.3))
+            ncores = int(s[s.placement == "all"].threads.max()) if (s.placement == "all").any() else 0
             for ax, pl in zip(axes, ["single", "all"]):
                 for i, (k, g) in enumerate(s[s.placement == pl].groupby("kernel")):
                     band(ax, g, "kB", "GBps", SERIES[i], k)
-                ax.set(xscale="log", yscale="log", xlabel="working set per thread [kB]",
-                       ylabel="GB/s", title=f"{node}: {'1 thread' if pl == 'single' else 'all cores'}")
+                title = "1 core" if pl == "single" else f"all {ncores} cores, 1 thread each"
+                ax.set(xscale="log", yscale="log", xlabel="working set per thread",
+                       ylabel="GB/s", title=f"{node}: {title}")
+                ticks = [16, 256, 4096, 65536, 1048576]
+                ax.set_xticks(ticks, ["16 kB", "256 kB", "4 MB", "64 MB", "1 GB"])
+                ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+                ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(subs=(1, 2, 5)))
+                ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
+                ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+                # Cache capacity one thread can use: all cores share each L3 between l3_cores threads
+                n = NODES[node]
+                l3 = n["l3_kb"] if pl == "single" else n["l3_kb"] / n["l3_cores"]
+                lines = [(n["l1_kb"], "L1"), (n["l2_kb"], "L2"), (l3, "L3")]
+                if 0.67 < l3 / n["l2_kb"] < 1.5:  # L2 and the L3 share coincide: one line
+                    lines = [lines[0], (n["l2_kb"], "L2 ≈ L3 share")]
+                for kb, name in lines:
+                    ax.axvline(kb, color="0.6", ls="--", lw=0.8, zorder=0)
+                    ax.text(kb, 1.0, f" {name}", transform=ax.get_xaxis_transform(),
+                            va="top", ha="left", fontsize=7, color="0.4")
             axes[0].legend()
             save(fig, f"likwid_bw_sizes_{node}")
         else:
