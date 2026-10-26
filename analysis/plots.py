@@ -128,11 +128,29 @@ def likwid_plots(df):
                 s["size"].str.extract(r"([kMG])B")[0].map({"k": 1, "M": 1024, "G": 1024**2})
             s["GBps"] = s.MBps / 1e3
             fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.3))
+            ncores = int(s[s.placement == "all"].threads.max()) if (s.placement == "all").any() else 0
             for ax, pl in zip(axes, ["single", "all"]):
                 for i, (k, g) in enumerate(s[s.placement == pl].groupby("kernel")):
                     band(ax, g, "kB", "GBps", SERIES[i], k)
-                ax.set(xscale="log", yscale="log", xlabel="working set per thread [kB]",
-                       ylabel="GB/s", title=f"{node}: {'1 thread' if pl == 'single' else 'all cores'}")
+                title = "1 core" if pl == "single" else f"all {ncores} cores, 1 thread each"
+                ax.set(xscale="log", yscale="log", xlabel="working set per thread",
+                       ylabel="GB/s", title=f"{node}: {title}")
+                ticks = [16, 256, 4096, 65536, 1048576]
+                ax.set_xticks(ticks, ["16 kB", "256 kB", "4 MB", "64 MB", "1 GB"])
+                ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+                ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(subs=(1, 2, 5)))
+                ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
+                ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+                # Cache capacity one thread can use: all cores share each L3 between l3_cores threads
+                n = NODES[node]
+                l3 = n["l3_kb"] if pl == "single" else n["l3_kb"] / n["l3_cores"]
+                lines = [(n["l1_kb"], "L1"), (n["l2_kb"], "L2"), (l3, "L3")]
+                if 0.67 < l3 / n["l2_kb"] < 1.5:  # L2 and the L3 share coincide: one line
+                    lines = [lines[0], (n["l2_kb"], "L2 ≈ L3 share")]
+                for kb, name in lines:
+                    ax.axvline(kb, color="0.6", ls="--", lw=0.8, zorder=0)
+                    ax.text(kb, 1.0, f" {name}", transform=ax.get_xaxis_transform(),
+                            va="top", ha="left", fontsize=7, color="0.4")
             axes[0].legend()
             save(fig, f"likwid_bw_sizes_{node}")
         else:
@@ -335,11 +353,50 @@ def roofline(lk, perf):
         save(fig, f"roofline_{node}")
 
 
+def likwid_compare(df):
+    """One figure, both nodes: compute, bandwidth vs cores, bandwidth vs working set.
+
+    Same kernel on both nodes where possible (triad_mem_avx scatter, triad_avx 1 core);
+    compute uses each node's widest SP FMA kernel (AVX2 on DINE, AVX-512 on DINE2).
+    """
+    best_sp = {"dine": "peakflops_sp_avx_fma", "dine2": "peakflops_sp_avx512_fma"}
+    nodes = [n for n in ["dine", "dine2"] if n in set(df.node)]
+    if len(nodes) < 2:
+        return discard("likwid_compare")
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.3))
+    for i, node in enumerate(nodes):
+        d, c, pk = df[df.node == node], SERIES[i], peaks(node)
+        fl = flops_rows(d)
+        band(axes[0], fl[fl.kernel == best_sp[node]], "threads", "GFlops", c, node)
+        axes[0].axhline(pk["gflops_sp"], color=c, lw=0.8, ls="--")
+        bw = d[(d["mode"] == "bw") & (d.kernel == "triad_mem_avx") & (d.placement == "scatter")]
+        band(axes[1], bw.assign(GBps=lambda x: x.MBps / 1e3), "threads", "GBps", c, node)
+        axes[1].axhline(pk["gbs"], color=c, lw=0.8, ls="--")
+        s = d[(d["mode"] == "sizes") & (d.placement == "single")].copy()
+        s["kB"] = s["size"].str.extract(r"(\d+)").astype(float)[0] * \
+            s["size"].str.extract(r"([kMG])B")[0].map({"k": 1, "M": 1024, "G": 1024**2})
+        band(axes[2], s.assign(GBps=lambda x: x.MBps / 1e3), "kB", "GBps", c, node)
+    axes[0].set(xlabel="cores", ylabel="GFLOP/s", title="SP compute (dashed: base-clock peak)")
+    axes[1].set(xlabel="cores", ylabel="GB/s", title="triad_mem, scatter (dashed: peak)")
+    axes[2].set(xscale="log", yscale="log", xlabel="working set", ylabel="GB/s",
+                title="triad, 1 core")
+    axes[2].set_xticks([16, 1024, 65536, 1048576], ["16 kB", "1 MB", "64 MB", "1 GB"])
+    axes[2].xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+    axes[2].yaxis.set_major_locator(matplotlib.ticker.LogLocator(subs=(1, 2, 5)))
+    axes[2].yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
+    axes[2].yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+    for ax in axes:
+        ax.title.set_fontsize(7)
+    axes[0].legend(loc="upper left")
+    save(fig, "likwid_compare")
+
+
 if __name__ == "__main__":
     lk, gr, pf = load("likwid.csv"), load("grid.csv"), load("perfctr.csv")
     if lk is None:
         lk = pd.DataFrame(columns=["node", "mode", "job", "kernel", "placement",
                                    "threads", "MBps", "MFlops"])
     likwid_plots(lk)
+    likwid_compare(lk)
     grid_plots(gr)
     roofline(lk, pf)
